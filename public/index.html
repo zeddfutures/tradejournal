@@ -930,16 +930,42 @@
     }
 
     // ── EMAIL FORM ──
-    function handleSubmit() {
-      const email = document.getElementById('email-input').value;
+    async function handleSubmit() {
+      const emailInput = document.getElementById('email-input');
+      const btn = document.querySelector('.email-form button');
+      const email = emailInput.value.trim();
+
       if (!email || !email.includes('@')) {
-        document.getElementById('email-input').style.borderColor = 'var(--danger)';
+        emailInput.style.borderColor = 'var(--danger)';
         return;
       }
-      // In production: send to your email service (Mailchimp, ConvertKit, etc.)
-      console.log('Lead captured:', email);
-      document.querySelector('.email-form').style.display = 'none';
-      document.getElementById('form-success').style.display = 'block';
+
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/.netlify/functions/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          document.querySelector('.email-form').style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          btn.textContent = 'Get Access';
+          btn.disabled = false;
+          emailInput.style.borderColor = 'var(--danger)';
+          emailInput.placeholder = data.error || 'Something went wrong. Try again.';
+        }
+      } catch (e) {
+        btn.textContent = 'Get Access';
+        btn.disabled = false;
+        emailInput.placeholder = 'Something went wrong. Try again.';
+      }
     }
 
     document.getElementById('email-input').addEventListener('keydown', (e) => {
