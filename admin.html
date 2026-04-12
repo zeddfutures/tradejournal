@@ -248,7 +248,7 @@ tbody tr:last-child td { border-bottom: none; }
 
 <script>
 // ── PASSWORD GATE ── change this to your password
-const ADMIN_PASSWORD = 'Farhan17!';
+const ADMIN_PASSWORD = 'zeddfutures2024';
 
 function checkPassword() {
   const val = document.getElementById('gate-input').value;
@@ -541,12 +541,30 @@ function init() {
   if (saved) {
     try { trades = JSON.parse(saved).map(normalizeTrade); } catch(e) { trades = []; }
   }
+  // Load keys from localStorage first (instant)
   document.getElementById('key-ibb').value = localStorage.getItem('k_ibb') || '';
   document.getElementById('key-brevo').value = localStorage.getItem('k_brv') || '';
   document.getElementById('key-list').value = localStorage.getItem('k_lst') || '';
   document.getElementById('jsonbin-id').value = localStorage.getItem('jsonbin_id') || '';
   document.getElementById('jsonbin-key').value = localStorage.getItem('jsonbin_key') || '';
   render();
+  // Then try to load from Netlify env vars (overwrites if available)
+  loadConfigFromNetlify();
+}
+
+async function loadConfigFromNetlify() {
+  try {
+    const res = await fetch('/.netlify/functions/get-config');
+    if (!res.ok) return;
+    const c = await res.json();
+    if (c.imgbb)      { document.getElementById('key-ibb').value    = c.imgbb;      localStorage.setItem('k_ibb', c.imgbb); }
+    if (c.brevoKey)   { document.getElementById('key-brevo').value  = c.brevoKey;   localStorage.setItem('k_brv', c.brevoKey); }
+    if (c.brevoList)  { document.getElementById('key-list').value   = c.brevoList;  localStorage.setItem('k_lst', c.brevoList); }
+    if (c.jsonbinId)  { document.getElementById('jsonbin-id').value = c.jsonbinId;  localStorage.setItem('jsonbin_id', c.jsonbinId); }
+    if (c.jsonbinKey) { document.getElementById('jsonbin-key').value= c.jsonbinKey; localStorage.setItem('jsonbin_key', c.jsonbinKey); }
+  } catch(e) {
+    // Silent fail — localStorage values already loaded above
+  }
 }
 
 function save() {
