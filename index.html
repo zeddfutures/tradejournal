@@ -183,9 +183,6 @@ footer p { font-size: 11px; color: var(--text3); line-height: 1.6; max-width: 60
     <div class="section-title">The Numbers<br>Don't Lie.</div>
     <div id="stats-grid" class="stats-grid">
       <div class="stat-card stat-card--hero"><div class="stat-label">Total Gain</div><div class="skeleton" style="height:60px;width:150px;"></div></div>
-      <div class="stat-card"><div class="stat-label">Win Rate</div><div class="skeleton" style="height:44px;width:100px;"></div></div>
-      <div class="stat-card"><div class="stat-label">Total Trades</div><div class="skeleton" style="height:44px;width:80px;"></div></div>
-      <div class="stat-card"><div class="stat-label">Account Balance</div><div class="skeleton" style="height:44px;width:120px;"></div></div>
     </div>
     <div id="stats-error" class="stats-error">⚠ Live stats unavailable right now. Check back shortly.</div>
   </div>
@@ -297,9 +294,6 @@ function renderStats(d) {
       <div><div class="stat-label">Total Gain</div><div class="stat-value stat-value--hero ${gc}">${fmt(d.gain)}%</div></div>
       <div class="stat-suffix">Absolute gain: ${fmt(d.absGain)}%</div>
     </div>
-    <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value positive">${d.winRate ? d.winRate+'%' : '—'}</div><div class="stat-suffix">${d.wonTrades??'—'} wins · ${d.lostTrades??'—'} losses</div></div>
-    <div class="stat-card"><div class="stat-label">Total Trades</div><div class="stat-value neutral">${d.totalTrades??'—'}</div><div class="stat-suffix"><span class="stat-live">Live data</span></div></div>
-    <div class="stat-card"><div class="stat-label">Account Balance</div><div class="stat-value neutral">${fmtMoney(d.balance,d.currency)}</div><div class="stat-suffix">Equity: ${fmtMoney(d.equity,d.currency)}</div></div>
   `;
 }
 
