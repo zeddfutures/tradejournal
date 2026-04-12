@@ -239,7 +239,7 @@ tbody tr:last-child td { border-bottom: none; }
     <input id="gate-input" type="password" placeholder="Enter password..." onkeydown="if(event.key==='Enter')checkPassword()"
       style="width:100%; background:var(--surface2); color:var(--text); border:1px solid var(--border2); padding:10px 14px; border-radius:8px; font-size:14px; font-family:'DM Sans'; outline:none; margin-bottom:10px;">
     <div id="gate-error" style="font-size:11px; color:var(--red); font-family:'DM Mono'; margin-bottom:10px; display:none;">Incorrect password.</div>
-    <button onclick="checkPassword()"
+    <button id="gate-btn" onclick="checkPassword()"
       style="width:100%; background:var(--accent); color:#000; border:none; padding:11px; border-radius:8px; font-weight:800; font-size:13px; font-family:'DM Sans'; cursor:pointer;">
       Enter
     </button>
@@ -247,23 +247,44 @@ tbody tr:last-child td { border-bottom: none; }
 </div>
 
 <script>
-// ── PASSWORD GATE ── change this to your password
-const ADMIN_PASSWORD = 'Farhan17!';
-
-function checkPassword() {
+async function checkPassword() {
   const val = document.getElementById('gate-input').value;
-  if (val === ADMIN_PASSWORD) {
-    document.getElementById('gate').style.display = 'none';
-    sessionStorage.setItem('zf_auth', '1');
-  } else {
-    document.getElementById('gate-error').style.display = 'block';
-    document.getElementById('gate-input').value = '';
-    document.getElementById('gate-input').focus();
+  if (!val) return;
+
+  const btn = document.getElementById('gate-btn');
+  const errEl = document.getElementById('gate-error');
+  btn.textContent = '...';
+  btn.disabled = true;
+  errEl.style.display = 'none';
+
+  try {
+    const res = await fetch('/.netlify/functions/check-auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: val })
+    });
+    const data = await res.json();
+
+    if (data.success && data.token) {
+      sessionStorage.setItem('zf_auth', data.token);
+      document.getElementById('gate').style.display = 'none';
+    } else {
+      errEl.textContent = 'Incorrect password.';
+      errEl.style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  } catch(e) {
+    errEl.textContent = 'Could not connect. Try again.';
+    errEl.style.display = 'block';
   }
+
+  btn.textContent = 'Enter';
+  btn.disabled = false;
 }
 
 // Skip gate if already authenticated this session
-if (sessionStorage.getItem('zf_auth') === '1') {
+if (sessionStorage.getItem('zf_auth')) {
   document.getElementById('gate').style.display = 'none';
 }
 </script>
