@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZEDDFUTURES | Trade Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FDFAF3;
+  --surface: #FFFFFF;
+  --surface2: #F5EFD8;
+  --surface3: #EDE4C4;
+  --border: rgba(201,168,76,0.18);
+  --border2: rgba(201,168,76,0.32);
+  --accent: #C9A84C;
+  --accent-dim: rgba(201,168,76,0.1);
+  --accent-mid: rgba(201,168,76,0.18);
+  --red: #A32020;
+  --red-dim: rgba(163,32,32,0.08);
+  --green: #1A6B3C;
+  --green-dim: rgba(26,107,60,0.08);
+  --text: #1A1711;
+  --text2: #6B6040;
+  --text3: #A89860;
+  --radius: 4px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; overflow-x: hidden; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px; min-height: 100vh; background: var(--surface);
+  border-right: 1px solid var(--border); display: flex; flex-direction: column;
+  padding: 20px 12px; position: fixed; top: 0; left: 0; z-index: 100;
+}
+.logo { font-family: 'Bebas Neue', sans-serif; font-weight: 900; font-size: 15px; color: var(--accent); letter-spacing: 0.06em; padding: 8px 12px 20px; border-bottom: 1px solid var(--border); margin-bottom: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.logo span { display: block; font-size: 9px; font-family: 'DM Mono'; font-weight: 400; color: var(--text2); letter-spacing: 2px; margin-top: 2px; }
+.nav-btn { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; color: var(--text2); background: none; border: none; width: 100%; text-align: left; transition: 0.15s; font-family: 'DM Sans'; letter-spacing: 0.3px; }
+.nav-btn:hover { background: var(--surface2); color: var(--text); }
+.nav-btn.active { background: var(--accent-dim); color: var(--accent); }
+.nav-btn svg { width: 15px; height: 15px; opacity: 0.7; flex-shrink: 0; }
+.nav-section { font-size: 9px; font-family: 'DM Mono'; color: var(--text3); letter-spacing: 1.5px; padding: 14px 12px 6px; }
+.sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+.api-field { margin-bottom: 10px; }
+.api-field label { font-size: 9px; font-family: 'DM Mono'; color: var(--text3); letter-spacing: 1px; display: block; margin-bottom: 4px; }
+.api-field input { background: rgba(201,168,76,0.06); color: var(--text); border: 1px solid var(--border); padding: 6px 8px; border-radius: 6px; width: 100%; font-size: 10px; font-family: 'DM Mono'; outline: none; transition: border-color 0.15s; }
+.api-field input:focus { border-color: var(--border2); }
+
+/* MAIN */
+.main { margin-left: 220px; flex: 1; padding: 32px 28px; max-width: calc(100vw - 220px); }
+
+/* HEADER */
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; }
+.page-title { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 32px; line-height: 1; letter-spacing: 0.04em; }
+.page-title span { font-size: 13px; font-family: 'DM Mono'; font-weight: 400; color: var(--text2); display: block; margin-bottom: 6px; letter-spacing: 1px; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+/* BUTTONS */
+.btn { padding: 9px 16px; border-radius: 8px; border: 1px solid var(--border2); background: var(--surface2); color: var(--text); font-size: 12px; font-family: 'DM Sans'; cursor: pointer; transition: 0.15s; display: flex; align-items: center; gap: 6px; }
+.btn:hover { background: var(--surface3); border-color: var(--text3); }
+.btn-accent { background: var(--accent); color: #0C0B08; border-color: var(--accent); font-weight: 600; letter-spacing: 0.04em; }
+.btn-accent:hover { background: #E8C96A; border-color: #E8C96A; }
+.btn svg { width: 13px; height: 13px; }
+
+/* STATS GRID */
+.stats-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; }
+.stat-card.c-gold::before { background: var(--accent); }
+.stat-card.c-green::before { background: var(--green); }
+.stat-card.c-red::before { background: var(--red); }
+.stat-card.c-muted::before { background: var(--border2); }
+.stat-label { font-size: 9px; font-family: 'DM Mono'; color: var(--text2); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+.stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 26px; font-weight: 400; line-height: 1; letter-spacing: 0.03em; }
+.stat-value.green { color: #1A6B3C; }
+.stat-value.red { color: #A32020; }
+.stat-value.gold { color: var(--accent); }
+
+/* BREAKDOWN SECTION */
+.breakdown-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.breakdown-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.breakdown-title { font-size: 10px; font-family: 'DM Mono'; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+.breakdown-row-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.breakdown-row-item:last-child { border-bottom: none; }
+.breakdown-key { font-size: 12px; color: var(--text2); }
+.breakdown-bar-wrap { flex: 1; margin: 0 12px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.breakdown-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+.breakdown-pct { font-size: 11px; font-family: 'DM Mono'; color: var(--accent); min-width: 35px; text-align: right; }
+.breakdown-wl { font-size: 10px; color: var(--text2); margin-left: 6px; font-family: 'DM Mono'; }
+
+/* FILTERS */
+.filters-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+.filter-select { background: var(--surface); color: var(--text2); border: 1px solid var(--border); padding: 7px 10px; border-radius: 8px; font-size: 11px; font-family: 'DM Mono'; outline: none; cursor: pointer; transition: 0.15s; appearance: none; }
+.filter-select:hover, .filter-select:focus { border-color: var(--border2); color: var(--text); }
+.filter-label { font-size: 10px; font-family: 'DM Mono'; color: var(--text3); letter-spacing: 0.5px; }
+.filter-count { font-size: 10px; font-family: 'DM Mono'; color: var(--text2); margin-left: auto; padding: 4px 10px; background: var(--surface2); border-radius: 6px; border: 1px solid var(--border); }
+
+/* TABLE */
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+thead tr { background: var(--surface2); }
+th { padding: 11px 12px; font-size: 9px; font-family: 'DM Mono'; text-transform: uppercase; color: var(--text3); letter-spacing: 1.5px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; cursor: pointer; user-select: none; transition: color 0.15s; }
+th:hover { color: var(--text2); }
+th.sort-asc::after { content: ' ↑'; color: var(--accent); }
+th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+td { padding: 7px 10px; border-bottom: 1px solid rgba(201,168,76,0.1); vertical-align: middle; }
+tbody tr { transition: background 0.1s; }
+tbody tr:hover { background: rgba(201,168,76,0.06); }
+tbody tr:last-child td { border-bottom: none; }
+
+/* TABLE INPUTS */
+.td-input, .td-select { background: transparent; color: var(--text); border: 1px solid transparent; padding: 5px 7px; border-radius: 6px; font-size: 12px; font-family: 'DM Sans'; outline: none; transition: 0.15s; width: 100%; }
+.td-input:hover, .td-select:hover { border-color: var(--border); background: var(--surface2); }
+.td-input:focus, .td-select:focus { border-color: var(--border2); background: var(--surface2); }
+.td-select option { background: #FDFAF3; color: #1A1711; }
+
+/* STATUS BADGES */
+.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-family: 'DM Mono'; font-weight: 500; letter-spacing: 0.5px; }
+.badge-win { background: rgba(26,107,60,0.08); color: #1A6B3C; border: 1px solid rgba(26,107,60,0.2); }
+.badge-loss { background: rgba(163,32,32,0.08); color: #A32020; border: 1px solid rgba(163,32,32,0.15); }
+.badge-be { background: rgba(201,168,76,0.1); color: var(--accent); border: 1px solid rgba(201,168,76,0.2); }
+
+/* PIP VALUE */
+.pip-pos { color: #1A6B3C; font-family: 'DM Mono'; font-size: 12px; }
+.pip-neg { color: #A32020; font-family: 'DM Mono'; font-size: 12px; }
+.pip-zero { color: var(--text2); font-family: 'DM Mono'; font-size: 12px; }
+
+/* TABLE ACTIONS */
+.row-actions { display: flex; align-items: center; gap: 6px; }
+.act-btn { background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 11px; transition: 0.15s; }
+.act-post { color: var(--accent); border: 1px solid rgba(201,168,76,0.3); }
+.act-post:hover { background: var(--accent-dim); }
+.act-del { color: #A32020; opacity: 0.4; }
+.act-del:hover { opacity: 1; background: rgba(163,32,32,0.08); }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+.empty-state .es-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.3; }
+.empty-state p { font-size: 13px; }
+
+/* TABLE FOOTER */
+.table-footer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+
+/* MODAL */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(26,23,17,0.85); z-index: 500; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+.modal-bg.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; width: 460px; max-width: 90vw; overflow: hidden; }
+.modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 20px; letter-spacing: 0.05em; }
+.modal-close { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 18px; padding: 4px; }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 20px 24px; }
+.modal-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.modal-tab { flex: 1; padding: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text2); font-size: 11px; font-family: 'DM Mono'; cursor: pointer; transition: 0.15s; }
+.modal-tab.active { background: var(--accent-dim); color: var(--accent); border-color: rgba(245,200,66,0.3); }
+.modal-tab-content { display: none; }
+.modal-tab-content.active { display: block; }
+.modal-canvas { border-radius: 8px; width: 100%; border: 1px solid var(--border); display: block; }
+.modal-textarea { width: 100%; height: 110px; background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 12px; font-family: 'DM Mono'; resize: none; outline: none; margin-top: 12px; line-height: 1.5; }
+.modal-textarea:focus { border-color: var(--border2); }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+
+/* TRADE DETAIL PREVIEW */
+.trade-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.tp-field { background: var(--surface2); border-radius: 8px; padding: 10px; }
+.tp-label { font-size: 9px; font-family: 'DM Mono'; color: var(--text2); letter-spacing: 1px; margin-bottom: 4px; }
+.tp-val { font-size: 14px; font-weight: 500; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border2); border-radius: 10px; padding: 12px 18px; font-size: 13px; z-index: 9999; transform: translateY(80px); opacity: 0; transition: 0.3s ease; max-width: 280px; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(0,232,122,0.3); color: #1A6B3C; }
+.toast.error { border-color: rgba(255,68,85,0.3); color: #A32020; }
+.fetch-modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; width: 500px; max-width: 92vw; overflow: hidden; }
+.fetch-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.fetch-field { background: var(--surface2); border-radius: 8px; padding: 10px 12px; }
+.fetch-field label { font-size: 9px; font-family: 'DM Mono'; color: var(--text3); letter-spacing: 1px; display: block; margin-bottom: 5px; text-transform: uppercase; }
+.fetch-field .fval { font-size: 14px; font-weight: 500; color: var(--text); font-family: 'DM Mono'; }
+.fetch-field select { background: var(--surface3); color: var(--text); border: 1px solid var(--border2); padding: 5px 8px; border-radius: 6px; font-size: 12px; font-family: 'DM Sans'; outline: none; width: 100%; }
+.fetch-notice { font-size: 11px; color: var(--text2); font-family: 'DM Mono'; padding: 8px 12px; background: var(--accent-dim); border-radius: 8px; border: 1px solid rgba(245,200,66,0.15); margin-bottom: 14px; line-height: 1.5; }
+.btn-fetch { background: var(--accent); color: #000; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'DM Sans'; transition: 0.15s; }
+.btn-fetch:hover { background: #E8C96A; }
+.btn-fetch:disabled { opacity: 0.5; cursor: not-allowed; }
+.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.mfx-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-family: 'DM Mono'; color: #1A6B3C; padding: 3px 8px; background: rgba(26,107,60,0.08); border-radius: 3px; border: 1px solid rgba(26,107,60,0.2); }
+
+/* ── MOBILE ── */
+.hamburger { display: none; background: none; border: none; color: var(--text); cursor: pointer; padding: 8px; }
+.hamburger svg { width: 20px; height: 20px; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99; }
+.sidebar-overlay.open { display: block; }
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 100;
+    width: 260px;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 16px; max-width: 100vw; }
+  .mobile-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+  .header-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .header-actions .btn:first-child { display: none; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .breakdown-row { grid-template-columns: 1fr; }
+  .filters-bar { gap: 6px; }
+  .filter-select { font-size: 10px; padding: 6px 8px; }
+  .filter-count { display: none; }
+  .hamburger { display: flex; align-items: center; justify-content: center; }
+  .page-title { font-size: 26px; }
+  .modal { width: 95vw; max-height: 90vh; overflow-y: auto; }
+  .fetch-modal { width: 95vw; max-height: 90vh; overflow-y: auto; }
+  .fetch-grid { grid-template-columns: 1fr 1fr; }
+  .stat-value { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="gate" style="display:flex; position:fixed; inset:0; background:var(--bg); z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
+  <div style="text-align:center; margin-bottom:32px;">
+    <div style="font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:26px; color:var(--accent); letter-spacing:0.06em;">ZEDDFUTURES</div>
+    <div style="font-size:9px; font-family:'DM Mono'; color:var(--text3); letter-spacing:2px; margin-top:4px;">ADMIN ACCESS</div>
+  </div>
+  <div style="background:var(--surface); border:1px solid var(--border2); border-radius:6px; padding:28px 32px; width:320px; max-width:90vw;">
+    <div style="font-size:11px; font-family:'DM Mono'; color:var(--text2); letter-spacing:1px; margin-bottom:12px;">PASSWORD</div>
+    <input id="gate-input" type="password" placeholder="Enter password..." onkeydown="if(event.key==='Enter')checkPassword()"
+      style="width:100%; background:var(--surface2); color:var(--text); border:1px solid var(--border2); padding:10px 14px; border-radius:4px; font-size:14px; font-family:'DM Sans'; outline:none; margin-bottom:10px;">
+    <div id="gate-error" style="font-size:11px; color:var(--red); font-family:'DM Mono'; margin-bottom:10px; display:none;">Incorrect password.</div>
+    <button id="gate-btn" onclick="checkPassword()"
+      style="width:100%; background:var(--accent); color:#000; border:none; padding:11px; border-radius:8px; font-weight:800; font-size:13px; font-family:'DM Sans'; cursor:pointer;">
+      Enter
+    </button>
+  </div>
+</div>
+
+<script>
+async function checkPassword() {
+  const val = document.getElementById('gate-input').value;
+  if (!val) return;
+
+  const btn = document.getElementById('gate-btn');
+  const errEl = document.getElementById('gate-error');
+  btn.textContent = '...';
+  btn.disabled = true;
+  errEl.style.display = 'none';
+
+  try {
+    const res = await fetch('/.netlify/functions/check-auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: val })
+    });
+    const data = await res.json();
+
+    if (data.success && data.token) {
+      sessionStorage.setItem('zf_auth', data.token);
+      document.getElementById('gate').style.display = 'none';
+    } else {
+      errEl.textContent = 'Incorrect password.';
+      errEl.style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  } catch(e) {
+    errEl.textContent = 'Could not connect. Try again.';
+    errEl.style.display = 'block';
+  }
+
+  btn.textContent = 'Enter';
+  btn.disabled = false;
+}
+
+// Skip gate if already authenticated this session
+if (sessionStorage.getItem('zf_auth')) {
+  document.getElementById('gate').style.display = 'none';
+}
+</script>
+
+<nav class="sidebar" id="sidebar">
+  <div style="display:flex; align-items:center; justify-content:space-between;">
+    <div class="logo">ZEDDFUTURES <span>TRADE JOURNAL</span></div>
+    <button class="hamburger" onclick="closeSidebar()" style="display:none" id="sidebar-close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="nav-section">NAVIGATE</div>
+  <button class="nav-btn active" onclick="showView('journal')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+    Trade Journal
+  </button>
+
+  <div class="nav-section" style="margin-top:12px;">DATA</div>
+  <button class="nav-btn" onclick="exportBackup()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Export Backup
+  </button>
+  <button class="nav-btn" onclick="document.getElementById('importFile').click()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    Import Backup
+  </button>
+  <input type="file" id="importFile" style="display:none" accept=".json" onchange="importBackup(this)">
+
+  <div class="nav-section" style="margin-top:12px;">MYFXBOOK</div>
+  <div style="padding: 0 4px 8px;">
+    <div style="font-size:10px; font-family:'DM Mono'; color:var(--text3); line-height:1.6; padding: 8px 12px; background:var(--surface2); border-radius:8px; border:1px solid var(--border);">
+      Connected via Netlify.<br>Credentials set in env vars.
+    </div>
+    <div id="mfx-status" style="margin-top:8px; display:none;"></div>
+  </div>
+
+  <div class="nav-section" style="margin-top:12px;">VSL VIDEO</div>
+  <div style="padding: 0 4px 12px;">
+    <div style="font-size:9px; font-family:'DM Mono'; color:var(--text3); letter-spacing:1px; margin-bottom:6px;">YOUTUBE OR VIMEO URL</div>
+    <input type="text" id="vsl-url" placeholder="https://youtube.com/embed/..." 
+      style="background:rgba(201,168,76,0.06); color:var(--text); border:1px solid var(--border); padding:6px 8px; border-radius:4px; width:100%; font-size:10px; font-family:'DM Mono'; outline:none; transition:border-color 0.15s;"
+      oninput="saveVSL()" onfocus="this.style.borderColor='var(--border2)'" onblur="this.style.borderColor='var(--border)'">
+    <div id="vsl-status" style="font-size:9px; font-family:'DM Mono'; color:var(--accent); margin-top:5px; display:none;">✓ Saved & synced</div>
+    <div style="font-size:9px; font-family:'DM Mono'; color:var(--text3); margin-top:5px; line-height:1.5;">
+      Paste an embed URL. Use YouTube:<br>
+      <span style="color:var(--accent)">youtube.com/embed/VIDEO_ID</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="api-field">
+      <label>JSONBIN BIN ID</label>
+      <input type="text" id="jsonbin-id" placeholder="bin id..." oninput="saveJSONBinCreds()">
+    </div>
+    <div class="api-field">
+      <label>JSONBIN MASTER KEY</label>
+      <input type="password" id="jsonbin-key" placeholder="$2a$..." oninput="saveJSONBinCreds()">
+    </div>
+    <div style="height:1px; background:var(--border); margin:10px 0;"></div>
+    <div class="api-field">
+      <label>IMGBB API KEY</label>
+      <input type="password" id="key-ibb" placeholder="••••••••" oninput="saveKeys()">
+    </div>
+    <div class="api-field">
+      <label>BREVO API KEY</label>
+      <input type="password" id="key-brevo" placeholder="••••••••" oninput="saveKeys()">
+    </div>
+    <div class="api-field">
+      <label>BREVO LIST ID</label>
+      <input type="text" id="key-list" placeholder="e.g. 3" oninput="saveKeys()">
+    </div>
+  </div>
+</nav>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<main class="main">
+  <div class="mobile-topbar" style="display:none" id="mobile-topbar">
+    <button class="hamburger" onclick="openSidebar()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span style="font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:20px; color:var(--accent); letter-spacing:0.05em;">ZEDDFUTURES</span>
+    <button class="btn btn-accent" style="padding:7px 12px; font-size:11px;" onclick="addTrade()">+ Add</button>
+  </div>
+  <div class="page-header">
+    <div class="page-title">
+      <span>OVERVIEW</span>
+      <div style="display:flex; align-items:center; gap:10px;">
+        Trade Journal
+        <div id="sync-dot" title="Sync status" style="width:7px;height:7px;border-radius:50%;background:var(--border2);transition:background 0.3s;flex-shrink:0;"></div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn" onclick="exportCSV()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        Export CSV
+      </button>
+      <button class="btn btn-accent" id="btn-fetch" onclick="fetchLatestTrade()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        Fetch Latest Trade
+      </button>
+      <button class="btn btn-accent" onclick="addTrade()">
+        + Add Trade
+      </button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="stats-row"></div>
+
+  <!-- BREAKDOWN -->
+  <div class="breakdown-row" id="breakdown-row"></div>
+
+  <!-- FILTERS -->
+  <div class="filters-bar">
+    <span class="filter-label">FILTER</span>
+    <select class="filter-select" id="f-pair" onchange="applyFilters()">
+      <option value="">All Pairs</option>
+      <option value="GBPUSD">GBPUSD</option>
+      <option value="EURUSD">EURUSD</option>
+    </select>
+    <select class="filter-select" id="f-session" onchange="applyFilters()">
+      <option value="">All Sessions</option>
+      <option value="LONDON">London</option>
+      <option value="NY">New York</option>
+      <option value="ASIA">Asia</option>
+    </select>
+    <select class="filter-select" id="f-dir" onchange="applyFilters()">
+      <option value="">All Directions</option>
+      <option value="BUY">Long (BUY)</option>
+      <option value="SELL">Short (SELL)</option>
+    </select>
+    <select class="filter-select" id="f-status" onchange="applyFilters()">
+      <option value="">All Results</option>
+      <option value="WIN">Wins</option>
+      <option value="LOSS">Losses</option>
+      <option value="BE">Break Even</option>
+    </select>
+    <button class="btn" style="font-size:11px; padding: 7px 12px;" onclick="clearFilters()">Clear</button>
+    <div class="filter-count" id="filter-count">0 trades</div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('date')" id="th-date">Date</th>
+            <th onclick="sortBy('pair')" id="th-pair">Pair</th>
+            <th onclick="sortBy('dir')" id="th-dir">Dir</th>
+            <th onclick="sortBy('time')" id="th-time">Time</th>
+            <th>Entry</th>
+            <th>Exit</th>
+            <th id="th-pips">Pips</th>
+            <th onclick="sortBy('lots')" id="th-lots">Lots</th>
+            <th onclick="sortBy('session')" id="th-session">Session</th>
+            <th onclick="sortBy('status')" id="th-status">Status</th>
+            <th>Notes / TV</th>
+            <th style="min-width:90px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <button class="btn btn-accent" style="font-size:12px; padding:8px 14px;" onclick="addTrade()">+ Add Trade</button>
+      <div class="filter-count" id="footer-count" style="margin-left:auto;"></div>
+    </div>
+  </div>
+</main>
+
+<!-- POST MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Post Trade</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="trade-preview" id="modal-preview"></div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchModalTab('card')">Trade Card</button>
+        <button class="modal-tab" onclick="switchModalTab('social')">Social Caption</button>
+        <button class="modal-tab" onclick="switchModalTab('email')">Email (Brevo)</button>
+      </div>
+      <div class="modal-tab-content active" id="mtab-card">
+        <canvas id="canvas" class="modal-canvas" width="1080" height="1350" style="max-height:340px; object-fit:contain;"></canvas>
+        <button class="btn" style="width:100%; margin-top:10px; justify-content:center;" onclick="downloadCard()">↓ Download Card</button>
+      </div>
+      <div class="modal-tab-content" id="mtab-social">
+        <textarea class="modal-textarea" id="captionSocial"></textarea>
+        <button class="btn btn-accent" style="width:100%; justify-content:center; margin-top:10px;" onclick="sendToBuffer()">→ Open in Buffer</button>
+      </div>
+      <div class="modal-tab-content" id="mtab-email">
+        <textarea class="modal-textarea" id="captionEmail" style="height:140px;"></textarea>
+        <button class="btn" style="width:100%; justify-content:center; margin-top:10px; background:#fff; color:#000; border-color:#fff; font-weight:700;" onclick="handleBrevo()">Send via Brevo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- MYFXBOOK FETCH MODAL -->
+<div class="modal-bg" id="fetch-modal">
+  <div class="fetch-modal">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="modal-title">MyFXBook Import</div>
+        <div class="mfx-tag"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;"></span>LIVE</div>
+      </div>
+      <button class="modal-close" onclick="closeFetchModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fetch-notice" id="fetch-notice">Fetching your latest closed trade from MyFXBook...</div>
+
+      <div class="fetch-grid" id="fetch-grid">
+        <div class="fetch-field"><label>Pair</label><div class="fval" id="fp-pair">—</div></div>
+        <div class="fetch-field"><label>Direction</label><div class="fval" id="fp-dir">—</div></div>
+        <div class="fetch-field"><label>Lots</label><div class="fval" id="fp-lots">—</div></div>
+        <div class="fetch-field"><label>Entry</label><div class="fval" id="fp-entry">—</div></div>
+        <div class="fetch-field"><label>Exit</label><div class="fval" id="fp-exit">—</div></div>
+        <div class="fetch-field"><label>Pips</label><div class="fval" id="fp-pips">—</div></div>
+        <div class="fetch-field"><label>Open Time</label><div class="fval" id="fp-time">—</div></div>
+        <div class="fetch-field"><label>Close Date</label><div class="fval" id="fp-date">—</div></div>
+        <div class="fetch-field"><label>Result (P/L)</label><div class="fval" id="fp-profit">—</div></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+        <div class="fetch-field">
+          <label>Session <span style="color:var(--accent)">*</span></label>
+          <select id="fp-session">
+            <option value="LONDON">London</option>
+            <option value="NY">New York</option>
+            <option value="ASIA">Asia</option>
+          </select>
+        </div>
+        <div class="fetch-field">
+          <label>Status <span style="color:var(--accent)">*</span></label>
+          <select id="fp-status">
+            <option value="WIN">WIN</option>
+            <option value="LOSS">LOSS</option>
+            <option value="BE">BE</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="font-size:10px; color:var(--text3); font-family:'DM Mono'; margin-bottom:16px;">
+        * Session and Status are auto-detected but you can override before saving.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-accent" style="flex:1; justify-content:center;" onclick="confirmFetchImport()">✓ Save to Journal</button>
+      <button class="btn" style="justify-content:center;" onclick="closeFetchModal()">Discard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let trades = [];
+let sortKey = 'date';
+let sortDir = 'desc';
+let activeFilters = { pair:'', session:'', dir:'', status:'' };
+let currentPostIdx = null;
+
+const STORAGE_KEY = 'zf_journal_v2';
+
+function normalizeTrade(t) {
+  return {
+    id: t.id || Date.now() + Math.random(),
+    date: t.date || '',
+    pair: t.pair || 'GBPUSD',
+    dir: t.dir || t.direction || 'BUY',
+    time: t.time || '',
+    entry: t.entry || '',
+    exit: t.exit || '',
+    lots: t.lots || '',
+    session: t.session || t.Session || '',
+    status: t.status || 'WIN',
+    notes: t.notes || '',
+  };
+}
+
+function init() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try { trades = JSON.parse(saved).map(normalizeTrade); } catch(e) { trades = []; }
+  }
+  // Load keys from localStorage first (instant)
+  document.getElementById('key-ibb').value = localStorage.getItem('k_ibb') || '';
+  document.getElementById('key-brevo').value = localStorage.getItem('k_brv') || '';
+  document.getElementById('key-list').value = localStorage.getItem('k_lst') || '';
+  document.getElementById('jsonbin-id').value = localStorage.getItem('jsonbin_id') || '';
+  document.getElementById('jsonbin-key').value = localStorage.getItem('jsonbin_key') || '';
+  // Load VSL URL
+  document.getElementById('vsl-url').value = localStorage.getItem('vsl_url') || '';
+  render();
+  // Then try to load from Netlify env vars (overwrites if available)
+  loadConfigFromNetlify();
+}
+
+async function loadConfigFromNetlify() {
+  try {
+    const res = await fetch('/.netlify/functions/get-config');
+    if (!res.ok) return;
+    const c = await res.json();
+    if (c.imgbb)      { document.getElementById('key-ibb').value    = c.imgbb;      localStorage.setItem('k_ibb', c.imgbb); }
+    if (c.brevoKey)   { document.getElementById('key-brevo').value  = c.brevoKey;   localStorage.setItem('k_brv', c.brevoKey); }
+    if (c.brevoList)  { document.getElementById('key-list').value   = c.brevoList;  localStorage.setItem('k_lst', c.brevoList); }
+    if (c.jsonbinId)  { document.getElementById('jsonbin-id').value = c.jsonbinId;  localStorage.setItem('jsonbin_id', c.jsonbinId); }
+    if (c.jsonbinKey) { document.getElementById('jsonbin-key').value= c.jsonbinKey; localStorage.setItem('jsonbin_key', c.jsonbinKey); }
+  } catch(e) {
+    // Silent fail — localStorage values already loaded above
+  }
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(trades));
+  syncToJSONBin();
+  render();
+}
+
+let syncTimer = null;
+function syncToJSONBin() {
+  const binId = localStorage.getItem('jsonbin_id');
+  const binKey = localStorage.getItem('jsonbin_key');
+  if (!binId || !binKey) return; // silent skip if not configured
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try {
+      await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': binKey },
+        body: JSON.stringify({ trades })
+      });
+      showSyncDot('synced');
+    } catch(e) { showSyncDot('error'); }
+  }, 1200); // debounce — waits 1.2s after last change before syncing
+}
+
+function showSyncDot(state) {
+  const el = document.getElementById('sync-dot');
+  if (!el) return;
+  el.style.background = state === 'synced' ? '#1A6B3C' : '#A32020';
+  el.title = state === 'synced' ? 'Synced to public' : 'Sync failed';
+  setTimeout(() => { el.style.background = 'var(--border2)'; }, 3000);
+}
+
+function saveKeys() {
+  localStorage.setItem('k_ibb', document.getElementById('key-ibb').value);
+  localStorage.setItem('k_brv', document.getElementById('key-brevo').value);
+  localStorage.setItem('k_lst', document.getElementById('key-list').value);
+}
+
+function saveVSL() {
+  const url = document.getElementById('vsl-url').value.trim();
+  localStorage.setItem('vsl_url', url);
+  // Sync to JSONBin so landing page can read it
+  syncVSLToJSONBin(url);
+}
+
+let vslSyncTimer = null;
+function syncVSLToJSONBin(url) {
+  const binId = localStorage.getItem('jsonbin_id');
+  const binKey = localStorage.getItem('jsonbin_key');
+  if (!binId || !binKey) return;
+  clearTimeout(vslSyncTimer);
+  vslSyncTimer = setTimeout(async () => {
+    const statusEl = document.getElementById('vsl-status');
+    try {
+      // Read current bin data first, then update with vsl_url included
+      const getRes = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+        headers: { 'X-Master-Key': binKey }
+      });
+      const existing = await getRes.json();
+      const currentData = existing.record || {};
+      await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': binKey },
+        body: JSON.stringify({ ...currentData, vsl_url: url })
+      });
+      statusEl.textContent = '✓ Saved & synced to landing page';
+      statusEl.style.display = 'block';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch(e) {
+      statusEl.textContent = '✗ Sync failed — saved locally only';
+      statusEl.style.display = 'block';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    }
+  }, 1000);
+}
+
+function saveJSONBinCreds() {
+  localStorage.setItem('jsonbin_id', document.getElementById('jsonbin-id').value);
+  localStorage.setItem('jsonbin_key', document.getElementById('jsonbin-key').value);
+}
+
+function addTrade() {
+  const today = new Date().toLocaleDateString('en-CA');
+  trades.unshift({ id: Date.now(), date: today, pair:'GBPUSD', dir:'BUY', time:'0800', entry:'', exit:'', lots:'0.01', session:'LONDON', status:'WIN', notes:'' });
+  save();
+}
+
+function updateField(id, key, val) {
+  const t = trades.find(t => t.id === id);
+  if (t) { t[key] = val; save(); }
+}
+
+function deleteTrade(id) {
+  if (!confirm('Delete this trade?')) return;
+  trades = trades.filter(t => t.id !== id);
+  save();
+}
+
+function calcPips(t) {
+  const e = parseFloat(t.entry), x = parseFloat(t.exit);
+  if (isNaN(e) || isNaN(x) || e === 0 || x === 0) return null;
+  const multiplier = (t.pair === 'GBPUSD' || t.pair === 'EURUSD') ? 10000 : 100;
+  let pips = (x - e) * multiplier;
+  if (t.dir === 'SELL') pips = -pips;
+  if (t.status === 'BE') return 0;
+  return Math.round(pips * 10) / 10;
+}
+
+function getFiltered() {
+  return trades.filter(t => {
+    if (activeFilters.pair && t.pair !== activeFilters.pair) return false;
+    if (activeFilters.session && t.session !== activeFilters.session) return false;
+    if (activeFilters.dir && t.dir !== activeFilters.dir) return false;
+    if (activeFilters.status && t.status !== activeFilters.status) return false;
+    return true;
+  }).sort((a, b) => {
+    let av = a[sortKey] || '', bv = b[sortKey] || '';
+    if (sortKey === 'date') { av = new Date(a.date); bv = new Date(b.date); }
+    if (sortKey === 'lots') { av = parseFloat(a.lots)||0; bv = parseFloat(b.lots)||0; }
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortKey = key; sortDir = 'desc'; }
+  render();
+}
+
+function applyFilters() {
+  activeFilters.pair = document.getElementById('f-pair').value;
+  activeFilters.session = document.getElementById('f-session').value;
+  activeFilters.dir = document.getElementById('f-dir').value;
+  activeFilters.status = document.getElementById('f-status').value;
+  renderTable();
+}
+
+function clearFilters() {
+  activeFilters = { pair:'', session:'', dir:'', status:'' };
+  document.getElementById('f-pair').value = '';
+  document.getElementById('f-session').value = '';
+  document.getElementById('f-dir').value = '';
+  document.getElementById('f-status').value = '';
+  renderTable();
+}
+
+function winRateOf(arr) {
+  const decided = arr.filter(t => t.status === 'WIN' || t.status === 'LOSS');
+  if (!decided.length) return 0;
+  return Math.round(arr.filter(t => t.status === 'WIN').length / decided.length * 100);
+}
+
+function renderStats() {
+  const all = trades;
+  const w = all.filter(t=>t.status==='WIN').length;
+  const l = all.filter(t=>t.status==='LOSS').length;
+  const be = all.filter(t=>t.status==='BE').length;
+  const wr = winRateOf(all);
+  const totalPips = all.reduce((sum,t) => { const p=calcPips(t); return sum+(p||0); }, 0);
+  const avgPips = all.length ? Math.round(totalPips / all.length * 10) / 10 : 0;
+  const streak = getStreak();
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card c-green"><div class="stat-label">WINS</div><div class="stat-value green">${w}</div></div>
+    <div class="stat-card c-red"><div class="stat-label">LOSSES</div><div class="stat-value red">${l}</div></div>
+    <div class="stat-card c-muted"><div class="stat-label">BREAK EVEN</div><div class="stat-value" style="color:var(--text2)">${be}</div></div>
+    <div class="stat-card c-gold"><div class="stat-label">WIN RATE</div><div class="stat-value gold">${wr}%</div></div>
+    <div class="stat-card c-${totalPips>=0?'green':'red'}"><div class="stat-label">TOTAL PIPS</div><div class="stat-value ${totalPips>=0?'green':'red'}">${totalPips>0?'+':''}${totalPips}</div></div>
+    <div class="stat-card c-muted"><div class="stat-label">AVG PIPS</div><div class="stat-value ${avgPips>=0?'green':'red'}">${avgPips>0?'+':''}${avgPips}</div></div>
+    <div class="stat-card c-${streak.dir==='W'?'green':'red'}"><div class="stat-label">STREAK</div><div class="stat-value ${streak.dir==='W'?'green':'red'}">${streak.count > 0 ? streak.dir+streak.count : '-'}</div></div>
+  `;
+
+  const pairs = ['GBPUSD','EURUSD'];
+  const sessions = ['LONDON','NY','ASIA'];
+  const dirs = [{key:'BUY',label:'Long'},{key:'SELL',label:'Short'}];
+
+  const pairHtml = pairs.map(p => {
+    const pt = all.filter(t=>t.pair===p);
+    const wr2 = winRateOf(pt);
+    const w2 = pt.filter(t=>t.status==='WIN').length;
+    const l2 = pt.filter(t=>t.status==='LOSS').length;
+    return `<div class="breakdown-row-item"><span class="breakdown-key">${p}</span><div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:${wr2}%"></div></div><span class="breakdown-pct">${wr2}%</span><span class="breakdown-wl">${w2}W/${l2}L</span></div>`;
+  }).join('');
+
+  const sessionHtml = sessions.map(s => {
+    const st = all.filter(t=>t.session===s);
+    const wr2 = winRateOf(st);
+    const w2 = st.filter(t=>t.status==='WIN').length;
+    const l2 = st.filter(t=>t.status==='LOSS').length;
+    return `<div class="breakdown-row-item"><span class="breakdown-key">${s}</span><div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:${wr2}%"></div></div><span class="breakdown-pct">${wr2}%</span><span class="breakdown-wl">${w2}W/${l2}L</span></div>`;
+  }).join('');
+
+  const dirHtml = dirs.map(d => {
+    const dt = all.filter(t=>t.dir===d.key);
+    const wr2 = winRateOf(dt);
+    const w2 = dt.filter(t=>t.status==='WIN').length;
+    const l2 = dt.filter(t=>t.status==='LOSS').length;
+    return `<div class="breakdown-row-item"><span class="breakdown-key">${d.label}</span><div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:${wr2}%"></div></div><span class="breakdown-pct">${wr2}%</span><span class="breakdown-wl">${w2}W/${l2}L</span></div>`;
+  }).join('');
+
+  document.getElementById('breakdown-row').innerHTML = `
+    <div class="breakdown-card"><div class="breakdown-title">BY PAIR</div>${pairHtml}</div>
+    <div class="breakdown-card"><div class="breakdown-title">BY SESSION</div>${sessionHtml}</div>
+    <div class="breakdown-card"><div class="breakdown-title">BY DIRECTION</div>${dirHtml}</div>
+  `;
+}
+
+function getStreak() {
+  const sorted = [...trades].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if (!sorted.length) return {count:0, dir:''};
+  const decided = sorted.filter(t=>t.status==='WIN'||t.status==='LOSS');
+  if (!decided.length) return {count:0, dir:''};
+  const dir = decided[0].status==='WIN'?'W':'L';
+  let count = 0;
+  for (let t of decided) {
+    if ((t.status==='WIN'&&dir==='W')||(t.status==='LOSS'&&dir==='L')) count++;
+    else break;
+  }
+  return {count, dir};
+}
+
+function renderTable() {
+  const filtered = getFiltered();
+  const tbody = document.getElementById('tbody');
+
+  document.getElementById('filter-count').textContent = filtered.length + ' trade' + (filtered.length===1?'':'s');
+  document.getElementById('footer-count').textContent = filtered.length + ' of ' + trades.length + ' trades';
+
+  ['date','pair','dir','time','lots','session','status'].forEach(k => {
+    const el = document.getElementById('th-'+k);
+    if (!el) return;
+    el.classList.remove('sort-asc','sort-desc');
+    if (sortKey===k) el.classList.add('sort-'+sortDir);
+  });
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty-state"><div class="es-icon">◻</div><p>No trades yet — add your first trade above.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(t => {
+    const pips = calcPips(t);
+    const pipHtml = pips === null ? `<span class="pip-zero">—</span>` :
+      pips > 0 ? `<span class="pip-pos">+${pips}</span>` :
+      pips < 0 ? `<span class="pip-neg">${pips}</span>` :
+      `<span class="pip-zero">0</span>`;
+    const badge = t.status==='WIN' ? 'badge-win' : t.status==='LOSS' ? 'badge-loss' : 'badge-be';
+    const formattedDate = t.date ? t.date.split('-').reverse().join('/') : '';
+    const idx = trades.findIndex(x=>x.id===t.id);
+    return `<tr>
+      <td><input class="td-input" style="width:110px" type="date" value="${t.date}" onchange="updateField(${t.id},'date',this.value)"></td>
+      <td><select class="td-select" style="width:90px" onchange="updateField(${t.id},'pair',this.value)">
+        <option value="GBPUSD" ${t.pair==='GBPUSD'?'selected':''}>GBPUSD</option>
+        <option value="EURUSD" ${t.pair==='EURUSD'?'selected':''}>EURUSD</option>
+      </select></td>
+      <td><select class="td-select" style="width:75px" onchange="updateField(${t.id},'dir',this.value)">
+        <option value="BUY" ${t.dir==='BUY'?'selected':''}>LONG</option>
+        <option value="SELL" ${t.dir==='SELL'?'selected':''}>SHORT</option>
+      </select></td>
+      <td><input class="td-input" style="width:75px" type="text" value="${t.time||''}" placeholder="0800" onchange="updateField(${t.id},'time',this.value)"></td>
+      <td><input class="td-input" style="width:90px" type="text" value="${t.entry||''}" placeholder="1.26500" onchange="updateField(${t.id},'entry',this.value)"></td>
+      <td><input class="td-input" style="width:90px" type="text" value="${t.exit||''}" placeholder="1.27000" onchange="updateField(${t.id},'exit',this.value)"></td>
+      <td style="white-space:nowrap">${pipHtml}</td>
+      <td><input class="td-input" style="width:70px" type="text" value="${t.lots||''}" placeholder="0.01" onchange="updateField(${t.id},'lots',this.value)"></td>
+      <td><select class="td-select" style="width:90px" onchange="updateField(${t.id},'session',this.value)">
+        <option value="LONDON" ${t.session==='LONDON'?'selected':''}>LONDON</option>
+        <option value="NY" ${t.session==='NY'?'selected':''}>NY</option>
+        <option value="ASIA" ${t.session==='ASIA'?'selected':''}>ASIA</option>
+      </select></td>
+      <td><select class="td-select" style="width:80px" onchange="updateField(${t.id},'status',this.value)">
+        <option value="WIN" ${t.status==='WIN'?'selected':''}>WIN</option>
+        <option value="LOSS" ${t.status==='LOSS'?'selected':''}>LOSS</option>
+        <option value="BE" ${t.status==='BE'?'selected':''}>BE</option>
+      </select></td>
+      <td><input class="td-input" style="width:160px" type="text" value="${t.notes||''}" placeholder="TradingView link..." onchange="updateField(${t.id},'notes',this.value)"></td>
+      <td><div class="row-actions">
+        <button class="act-btn act-post" onclick="prepPost(${idx})">POST</button>
+        <button class="act-btn act-del" onclick="deleteTrade(${t.id})">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function render() {
+  renderStats();
+  renderTable();
+}
+
+/* POST MODAL */
+function prepPost(idx) {
+  currentPostIdx = idx;
+  const t = trades[idx];
+  const pips = calcPips(t);
+  const pipStr = pips !== null ? (pips>0?'+':'') + pips + ' pips' : '—';
+  const w = trades.filter(x=>x.status==='WIN').length;
+  const l = trades.filter(x=>x.status==='LOSS').length;
+  const wr = winRateOf(trades);
+  const dirLabel = t.dir==='SELL'?'SHORT':'LONG';
+
+  document.getElementById('modal-preview').innerHTML = `
+    <div class="tp-field"><div class="tp-label">PAIR</div><div class="tp-val">${t.pair} ${dirLabel}</div></div>
+    <div class="tp-field"><div class="tp-label">RESULT</div><div class="tp-val ${t.status==='WIN'?'green':t.status==='LOSS'?'red':'gold'}" style="color:${t.status==='WIN'?'#1A6B3C':t.status==='LOSS'?'#A32020':'var(--accent)'}">${t.status}</div></div>
+    <div class="tp-field"><div class="tp-label">PIPS</div><div class="tp-val">${pipStr}</div></div>
+    <div class="tp-field"><div class="tp-label">SESSION</div><div class="tp-val">${t.session}</div></div>
+  `;
+
+  const tags = '#forex #copytrading #zeddfutures #daytrader #ICT';
+  document.getElementById('captionSocial').value = `${t.status === 'WIN' ? '✅' : t.status === 'LOSS' ? '❌' : '➖'} ${t.status} — ${t.pair} ${dirLabel}\n\n🕐 Session: ${t.session}\n📈 Entry: ${t.entry || '—'} → Exit: ${t.exit || '—'}\n📊 ${pipStr}\n\n🏆 Record: ${w}W - ${l}L (${wr}% win rate)\n\n${tags}`;
+  document.getElementById('captionEmail').value = `Hi,\n\nHere's today's closed trade:\n\nPair: ${t.pair} ${dirLabel}\nResult: ${t.status}\nSession: ${t.session}\nEntry: ${t.entry || '—'} | Exit: ${t.exit || '—'}\nPips: ${pipStr}\n\nRecord: ${w}W - ${l}L\n\nInterested in copy trading? Join here:\nhttps://zeddfuturesonboarding.netlify.app/\n\nZedd`;
+
+  document.getElementById('modal').classList.add('open');
+  switchModalTab('card');
+  setTimeout(() => drawCard(t), 50);
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function switchModalTab(tab) {
+  document.querySelectorAll('.modal-tab, .modal-tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.modal-tab[onclick="switchModalTab('${tab}')"]`).classList.add('active');
+  document.getElementById('mtab-'+tab).classList.add('active');
+}
+
+function drawCard(t) {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const W = 1080, H = 1350;
+  ctx.clearRect(0,0,W,H);
+
+  ctx.fillStyle = '#08070a';
+  ctx.fillRect(0,0,W,H);
+
+  const acc = t.status==='WIN'?'#00e87a':(t.status==='LOSS'?'#ff4455':'#f5c842');
+
+  ctx.fillStyle = 'rgba(245,200,66,0.05)';
+  for (let x=0; x<W; x+=60) { for (let y=0; y<H; y+=60) { ctx.fillRect(x,y,1,1); } }
+
+  ctx.fillStyle = acc + '15';
+  ctx.beginPath(); ctx.arc(540, 660, 400, 0, Math.PI*2); ctx.fill();
+
+  ctx.font = '400 48px Bebas Neue, sans-serif';
+  ctx.fillStyle = '#f5c842';
+  ctx.textAlign = 'left';
+  ctx.fillText('ZEDDFUTURES', 80, 130);
+
+  ctx.font = '400 24px DM Mono, monospace';
+  ctx.fillStyle = '#4a4220';
+  ctx.fillText('COPY TRADE RESULT', 80, 168);
+
+  ctx.strokeStyle = '#272000';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(80, 200); ctx.lineTo(1000, 200); ctx.stroke();
+
+  const sym = t.pair + '  ' + (t.dir==='SELL'?'SHORT':'LONG');
+  let fS = 120;
+  ctx.font = `400 ${fS}px Bebas Neue, sans-serif`;
+  while (ctx.measureText(sym).width > 920) { fS -= 5; ctx.font = `400 ${fS}px Bebas Neue, sans-serif`; }
+  ctx.fillStyle = '#f0e8c8';
+  ctx.textAlign = 'center';
+  ctx.fillText(sym, 540, 360);
+
+  const labY = 480;
+  const fields = [
+    {label:'ENTRY', val: t.entry || '—'},
+    {label:'EXIT', val: t.exit || '—'},
+    {label:'SESSION', val: t.session || '—'},
+    {label:'DATE', val: t.date ? t.date.split('-').reverse().join('/') : '—'},
+  ];
+  const bw = 220, bh = 110, gap = 18;
+  const totalW = fields.length * bw + (fields.length-1)*gap;
+  let bx = (W - totalW) / 2;
+  fields.forEach(f => {
+    ctx.strokeStyle = acc + '60';
+    ctx.lineWidth = 2;
+    roundRect(ctx, bx, labY, bw, bh, 18);
+    ctx.stroke();
+    ctx.fillStyle = '#4a4220';
+    ctx.font = '500 18px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(f.label, bx + bw/2, labY + 30);
+    ctx.fillStyle = '#f0e8c8';
+    ctx.font = '700 32px DM Sans, sans-serif';
+    ctx.fillText(f.val, bx + bw/2, labY + 75);
+    bx += bw + gap;
+  });
+
+  let statusSize = 280;
+  ctx.font = `400 ${statusSize}px Bebas Neue, sans-serif`;
+  while (ctx.measureText(t.status).width > 900) { statusSize -= 10; ctx.font = `400 ${statusSize}px Bebas Neue, sans-serif`; }
+  ctx.fillStyle = acc;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(t.status, 540, 870);
+  ctx.textBaseline = 'alphabetic';
+
+  const pips = calcPips(t);
+  if (pips !== null) {
+    const pipStr = (pips>0?'+':'') + pips + ' PIPS';
+    ctx.font = '500 36px DM Mono, monospace';
+    ctx.fillStyle = acc + 'cc';
+    ctx.fillText(pipStr, 540, 1000);
+  }
+
+  const w = trades.filter(x=>x.status==='WIN').length;
+  const l = trades.filter(x=>x.status==='LOSS').length;
+  const be = trades.filter(x=>x.status==='BE').length;
+  const wr = winRateOf(trades);
+
+  ctx.strokeStyle = '#272000';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([6,10]);
+  ctx.beginPath(); ctx.moveTo(80, 1070); ctx.lineTo(1000, 1070); ctx.stroke();
+  ctx.setLineDash([]);
+
+  const statsText = `${w}W  ${l}L  ${be}BE  •  ${wr}% WIN RATE`;
+  ctx.font = '500 34px DM Sans, sans-serif';
+  ctx.fillStyle = '#7a6e3a';
+  ctx.textAlign = 'center';
+  ctx.fillText(statsText, 540, 1150);
+
+  ctx.font = '400 26px DM Mono, monospace';
+  ctx.fillStyle = '#4a4220';
+  ctx.fillText('@zeddfutures', 540, 1280);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+
+function downloadCard() {
+  const canvas = document.getElementById('canvas');
+  const a = document.createElement('a');
+  a.download = `zeddfutures_trade_${Date.now()}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  toast('Card downloaded!', 'success');
+}
+
+async function sendToBuffer() {
+  const key = document.getElementById('key-ibb').value;
+  const caption = document.getElementById('captionSocial').value;
+  if (!key) {
+    window.open('https://buffer.com/app', '_blank');
+    toast('Add ImgBB key to auto-attach image', 'error');
+    return;
+  }
+  toast('Uploading image...', '');
+  try {
+    const dataUrl = document.getElementById('canvas').toDataURL('image/png').split(',')[1];
+    const fd = new FormData(); fd.append('image', dataUrl);
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${key}`, { method:'POST', body:fd });
+    const json = await res.json();
+    const url = json.data.image.url;
+    window.open(`https://buffer.com/add?picture=${encodeURIComponent(url)}&text=${encodeURIComponent(caption)}`, '_blank');
+    toast('Opened in Buffer!', 'success');
+  } catch(e) { toast('ImgBB upload failed', 'error'); }
+}
+
+async function handleBrevo() {
+  const key = document.getElementById('key-brevo').value;
+  const listId = parseInt(document.getElementById('key-list').value);
+  if (!key || isNaN(listId)) { toast('Brevo key and list ID required', 'error'); return; }
+  const t = trades[currentPostIdx];
+  toast('Sending via Brevo...', '');
+
+  let tvHtml = '';
+  const tvMatch = (t.notes||'').match(/tradingview\.com\/x\/([a-zA-Z0-9]+)/);
+  if (tvMatch) {
+    const id = tvMatch[1];
+    tvHtml = `<div style="margin:16px 0"><img src="https://s3.tradingview.com/snapshots/${id.charAt(0).toLowerCase()}/${id}.png" style="max-width:100%;border-radius:8px"/></div>`;
+  }
+
+  const emailText = document.getElementById('captionEmail').value;
+
+  try {
+    const cr = await fetch('https://api.brevo.com/v3/emailCampaigns', {
+      method:'POST',
+      headers:{'accept':'application/json','api-key':key,'content-type':'application/json'},
+      body: JSON.stringify({
+        sender:{name:'Zedd',email:'support@zeddfutures.com'},
+        name:'Trade Alert '+Date.now(),
+        subject:'Trade Alert — ' + t.pair + ' ' + (t.dir==='SELL'?'SHORT':'LONG') + ' ' + t.status,
+        htmlContent: `<html><body style="font-family:sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px"><div style="border-left:4px solid #f5c842;padding:4px 16px;margin-bottom:20px"><h1 style="margin:0;font-size:22px">ZEDDFUTURES</h1><p style="color:#888;margin:4px 0 0">Trade Alert</p></div>${tvHtml}<div style="background:#f9f9f9;padding:16px;border-radius:8px;white-space:pre-wrap;font-family:monospace;font-size:14px">${emailText}</div><hr style="border:none;border-top:1px solid #eee;margin:24px 0"><p style="color:#999;font-size:12px">@zeddfutures · <a href="https://zeddfuturesonboarding.netlify.app/" style="color:#f5c842">Join Copytrading</a></p></body></html>`,
+        recipients:{listIds:[listId]}
+      })
+    });
+    const result = await cr.json();
+    if (!cr.ok) throw new Error(result.message);
+    await fetch(`https://api.brevo.com/v3/emailCampaigns/${result.id}/sendNow`, { method:'POST', headers:{'accept':'application/json','api-key':key} });
+    toast('Email sent to list!', 'success');
+    closeModal();
+  } catch(e) { toast('Brevo error: ' + e.message, 'error'); }
+}
+
+function exportBackup() {
+  const blob = new Blob([JSON.stringify(trades, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ZeddFutures_Backup_${new Date().toLocaleDateString('en-CA')}.json`;
+  a.click();
+  toast('Backup exported', 'success');
+}
+
+function importBackup(input) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!Array.isArray(data)) throw new Error('Invalid format');
+      trades = data.map(normalizeTrade);
+      save();
+      toast(`Imported ${trades.length} trades`, 'success');
+    } catch(e) { toast('Import failed — invalid file', 'error'); }
+  };
+  reader.readAsText(input.files[0]);
+}
+
+function exportCSV() {
+  const headers = ['Date','Pair','Direction','Time','Entry','Exit','Pips','Lots','Session','Status','Notes'];
+  const rows = trades.map(t => {
+    const pips = calcPips(t);
+    return [t.date, t.pair, t.dir, t.time, t.entry, t.exit, pips!==null?pips:'', t.lots, t.session, t.status, t.notes].map(v => `"${v||''}"`).join(',');
+  });
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ZeddFutures_${new Date().toLocaleDateString('en-CA')}.csv`;
+  a.click();
+  toast('CSV exported', 'success');
+}
+
+function showView(v) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeFetchModal(); } });
+
+/* ── MYFXBOOK — via Netlify function ── */
+let pendingFetchTrade = null;
+
+const NETLIFY_FN = 'https://zeddfuturestradejournal.netlify.app/.netlify/functions/myfxbook';
+
+function nyCloseToSGT(timeStr) {
+  if (!timeStr) return null;
+  // Fusion Markets timestamps are NY Close (UTC-4, no timezone suffix)
+  // Parse as UTC-4 by appending offset, convert to SGT (UTC+8)
+  const hasOffset = /[Z+\-]\d{2}:?\d{2}$/.test(timeStr) || timeStr.endsWith('Z');
+  const baseTime = hasOffset ? new Date(timeStr) : new Date(timeStr + '-04:00');
+  if (isNaN(baseTime)) return null;
+  // SGT = UTC+8, shift by +12 from UTC-4
+  return new Date(baseTime.getTime() + (8 * 60 * 60 * 1000));
+}
+
+function detectSession(timeStr) {
+  if (!timeStr) return 'LONDON';
+  const sgt = nyCloseToSGT(timeStr);
+  if (!sgt) return 'LONDON';
+  const hour = sgt.getUTCHours(); // use UTC on the already-shifted time
+  // SGT session windows:
+  // ASIA:   00:00 – 08:00 SGT
+  // LONDON: 15:00 – 23:00 SGT  (London open 3pm SGT)
+  // NY:     20:00 – 04:00 SGT  (NY open 8pm SGT)
+  // Priority: NY > LONDON > ASIA (overlaps go to the active session)
+  if (hour >= 20 || hour < 4)  return 'NY';
+  if (hour >= 15 && hour < 20) return 'LONDON';
+  return 'ASIA';
+}
+
+function detectStatus(profit, pips) {
+  const pp = parseFloat(pips);
+  const p  = parseFloat(profit);
+  if (!isNaN(pp) && Math.abs(pp) < 0.6) return 'BE';
+  if (!isNaN(p)) return p >= 0 ? 'WIN' : 'LOSS';
+  return 'WIN';
+}
+
+function mapSymbol(raw) {
+  if (!raw) return 'GBPUSD';
+  const s = raw.toUpperCase().replace(/[^A-Z]/g, '');
+  if (s.includes('GBPUSD')) return 'GBPUSD';
+  if (s.includes('EURUSD')) return 'EURUSD';
+  return s.substring(0, 6) || 'GBPUSD';
+}
+
+async function fetchLatestTrade() {
+  const btn = document.getElementById('btn-fetch');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Fetching...`;
+
+  try {
+    const res = await fetch(NETLIFY_FN);
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    processFetchResult(data);
+  } catch(e) {
+    toast('Fetch failed: ' + e.message, 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Fetch Latest Trade`;
+}
+
+function processFetchResult(data) {
+  // Netlify function returns { trades: [...], name, gain, ... }
+  // trades[] is already sorted by closeTime desc, slice(0,5)
+  const history = data.trades;
+  if (!history || !history.length) throw new Error('No closed trades found on this account.');
+
+  const t = history[0]; // already the latest
+
+  const closeTime = t.closeTime || '';
+  const openTime  = t.openTime  || '';
+  const pair   = mapSymbol(t.symbol || '');
+  const action = (t.action || '').toString().toLowerCase();
+  const dir    = (action.includes('sell') || action === '1') ? 'SELL' : 'BUY';
+  const entry  = parseFloat(t.openPrice  || 0).toFixed(5);
+  const exit   = parseFloat(t.closePrice || 0).toFixed(5);
+  const lots   = String(t.size || t.volume || '');
+  const rawPips = parseFloat(t.pips || 0);
+  const pips   = String(Math.round(rawPips * 10) / 10);
+  const profit = String(parseFloat(t.profit || 0).toFixed(2));
+  const closeSGT = nyCloseToSGT(closeTime);
+  const openSGT  = nyCloseToSGT(openTime);
+  const dateStr = closeSGT ? closeSGT.toLocaleDateString('en-CA', {timeZone:'Asia/Singapore'}) : new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Singapore'});
+  const timeStr = openSGT  ? openSGT.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Singapore'}) : '';
+  const session = detectSession(closeTime || openTime);
+  const status  = detectStatus(profit, pips);
+
+  pendingFetchTrade = { pair, dir, entry, exit, lots, date: dateStr, time: timeStr, session, status, notes: '' };
+
+  document.getElementById('fp-pair').textContent   = pair;
+  document.getElementById('fp-dir').textContent    = dir === 'SELL' ? 'SHORT' : 'LONG';
+  document.getElementById('fp-lots').textContent   = lots || '—';
+  document.getElementById('fp-entry').textContent  = entry !== '0.00000' ? entry : '—';
+  document.getElementById('fp-exit').textContent   = exit  !== '0.00000' ? exit  : '—';
+  document.getElementById('fp-pips').textContent   = pips  ? (parseFloat(pips) > 0 ? '+' : '') + pips : '—';
+  document.getElementById('fp-date').textContent   = dateStr;
+  document.getElementById('fp-time').textContent   = timeStr || '—';
+  document.getElementById('fp-profit').textContent = (parseFloat(profit) >= 0 ? '+' : '') + profit;
+  document.getElementById('fp-session').value = session;
+  document.getElementById('fp-status').value  = status;
+  document.getElementById('fetch-notice').textContent = 'Latest closed trade found. Review and override Session / Status if needed.';
+
+  // Show connected indicator
+  const statusEl = document.getElementById('mfx-status');
+  statusEl.style.display = 'flex';
+  statusEl.innerHTML = `<div class="mfx-tag"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;"></span>Connected · ${data.name || 'Account'}</div>`;
+
+  document.getElementById('fetch-modal').classList.add('open');
+}
+
+function confirmFetchImport() {
+  if (!pendingFetchTrade) return;
+  const session = document.getElementById('fp-session').value;
+  const status  = document.getElementById('fp-status').value;
+  const trade = normalizeTrade({ ...pendingFetchTrade, session, status, id: Date.now() });
+  trades.unshift(trade);
+  save();
+  closeFetchModal();
+  toast('Trade imported from MyFXBook!', 'success');
+  pendingFetchTrade = null;
+}
+
+function closeFetchModal() {
+  document.getElementById('fetch-modal').classList.remove('open');
+}
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+  document.getElementById('sidebar-close').style.display = 'flex';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+function checkMobile() {
+  const isMobile = window.innerWidth <= 768;
+  document.getElementById('mobile-topbar').style.display = isMobile ? 'flex' : 'none';
+  document.getElementById('sidebar-close').style.display = isMobile && document.getElementById('sidebar').classList.contains('open') ? 'flex' : 'none';
+}
+window.addEventListener('resize', checkMobile);
+
+init();
+checkMobile();
+</script>
+</body>
+</html>
