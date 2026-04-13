@@ -452,8 +452,8 @@ async function loadStats() {
 }
 
 async function loadVSL() {
-  const binId = 'PASTE_YOUR_BIN_ID_HERE';
-  const binKey = 'PASTE_YOUR_ACCESS_KEY_HERE';
+  const binId = '69db9c4aaaba882197eeb4a6';
+  const binKey = '$2a$10$RN7frb3x1p1Hr7UiBQYsEOIMfOnF.vU4./sfQCxjSVhOmUt3Lq92m';
   try {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, { headers: { 'X-Access-Key': binKey } });
     if (!res.ok) throw new Error();
