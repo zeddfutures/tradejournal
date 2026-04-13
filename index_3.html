@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZeddFutures — Copy Trading</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #C9A84C; --gold-light: #E8C96A; --gold-pale: #F7F0DC;
+  --gold-dim: rgba(201,168,76,0.12);
+  --ink: #1A1711; --ink2: #3D3828; --ink3: #6B6040;
+  --cream: #FDFAF3; --cream2: #F5EFD8; --cream3: #EDE4C4;
+  --white: #FFFFFF;
+  --border: rgba(201,168,76,0.2); --border2: rgba(201,168,76,0.35);
+}
+html { font-size: 14px; scroll-behavior: smooth; }
+body { background: var(--cream); color: var(--ink); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.4;
+}
+
+/* NAV — mobile base */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 14px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(253,250,243,0.95); backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--ink); letter-spacing: 0.5px; }
+.nav-logo em { color: var(--gold); font-style: normal; }
+.nav-links { display: none; align-items: center; gap: 28px; }
+.nav-links a { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink3); text-decoration: none; transition: color 0.2s; }
+.nav-links a:hover { color: var(--ink); }
+.nav-cta-desktop { display: none; }
+.nav-cta {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  text-decoration: none; color: var(--ink) !important; background: var(--gold);
+  padding: 9px 14px; border-radius: 2px; transition: background 0.2s; white-space: nowrap;
+}
+.nav-cta:hover { background: var(--gold-light); }
+
+/* HERO — mobile base: single column */
+.hero { padding: 80px 20px 44px; border-bottom: 1px solid var(--border); }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 18px;
+  opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s;
+}
+.hero-eyebrow::before { content: ''; display: block; width: 18px; height: 1px; background: var(--gold); }
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 13vw, 5.2rem);
+  line-height: 0.95; letter-spacing: 0.02em; color: var(--ink); margin-bottom: 18px;
+  opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s;
+}
+.hero h1 em { color: var(--gold); font-style: normal; }
+.hero h1 .stroke { -webkit-text-stroke: 1.5px var(--ink3); color: transparent; }
+.hero-sub {
+  font-size: 15px; font-weight: 300; line-height: 1.75; color: var(--ink3);
+  margin-bottom: 24px; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s;
+}
+.hero-sub strong { color: var(--ink); font-weight: 500; }
+.hero-actions {
+  display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;
+  opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s;
+}
+.btn-primary {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--ink); color: var(--cream); font-size: 13px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none;
+  padding: 16px 24px; border-radius: 2px; transition: background 0.2s;
+  min-height: 52px; -webkit-tap-highlight-color: transparent;
+}
+.btn-primary:hover { background: var(--ink2); }
+.btn-ghost {
+  font-size: 12px; font-weight: 500; letter-spacing: 0.05em; color: var(--ink3);
+  text-decoration: none; border-bottom: 1px solid var(--border2); padding-bottom: 2px;
+  align-self: center; transition: color 0.2s;
+}
+.btn-ghost:hover { color: var(--ink); }
+
+/* Hero stat card */
+.hero-stat-card {
+  background: var(--ink); border-radius: 4px; padding: 22px 20px;
+  margin-bottom: 12px; position: relative; overflow: hidden;
+  opacity: 0; animation: fadeUp 0.7s ease forwards 0.45s;
+}
+.hero-stat-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); }
+.hsc-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.hsc-value { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 14vw, 52px); line-height: 1; color: var(--gold-light); }
+.hsc-sub { font-size: 10px; color: rgba(201,168,76,0.5); margin-top: 6px; font-family: 'DM Mono', monospace; }
+.verified-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--gold); padding: 8px 12px;
+  border: 1px solid var(--border2); border-radius: 2px; background: var(--gold-dim);
+  opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s;
+}
+.verified-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); animation: pulse 2s infinite; display: inline-block; flex-shrink: 0; }
+
+/* SECTIONS — mobile base */
+.section { padding: 52px 20px; }
+.section-inner { max-width: 1200px; margin: 0 auto; }
+.section-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+.section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem, 9vw, 3.6rem); line-height: 1; letter-spacing: 0.02em; color: var(--ink); margin-bottom: 28px; }
+.section-title em { color: var(--gold); font-style: normal; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 0 20px; }
+
+/* VSL */
+.vsl-section { background: var(--ink); padding: 52px 20px; }
+.vsl-section .section-title { color: var(--cream); margin-bottom: 12px; }
+.vsl-section .section-title em { color: var(--gold-light); font-style: normal; }
+.vsl-subtitle { font-size: 14px; color: rgba(245,239,216,0.5); margin-bottom: 24px; font-weight: 300; line-height: 1.7; }
+.vsl-frame {
+  aspect-ratio: 16/9; background: #0D0C07; border-radius: 4px;
+  border: 1px solid rgba(201,168,76,0.2); display: flex; align-items: center;
+  justify-content: center; position: relative; overflow: hidden; cursor: pointer;
+}
+.vsl-frame::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.04) 0%, transparent 60%); }
+.vsl-play { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; transition: transform 0.2s; position: relative; z-index: 1; }
+.vsl-frame:hover .vsl-play { transform: scale(1.1); }
+.vsl-play svg { width: 24px; height: 24px; fill: var(--ink); margin-left: 4px; }
+.vsl-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.5px; color: rgba(201,168,76,0.4); margin-top: 12px; text-align: center; text-transform: uppercase; }
+
+/* STATS */
+.stats-grid { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.stat-cell { background: var(--white); padding: 24px 20px; border-bottom: 1px solid var(--border); }
+.stat-cell:last-child { border-bottom: none; }
+.stat-cell .label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink3); margin-bottom: 10px; }
+.stat-cell .value { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 12vw, 5rem); line-height: 1; color: var(--ink); }
+.stat-cell .value.gold { color: var(--gold); }
+.stat-cell .suffix { font-size: 11px; color: var(--ink3); margin-top: 8px; font-family: 'DM Mono', monospace; line-height: 1.5; }
+.stat-cell.wide { background: var(--gold-pale); padding: 16px 20px; }
+
+/* TRADES */
+.trades-wrap { border: 1px solid var(--border); border-radius: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.trades-table { width: 100%; border-collapse: collapse; min-width: 360px; }
+.trades-table thead { background: var(--cream2); }
+.trades-table th { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink3); padding: 11px 12px; text-align: left; border-bottom: 1px solid var(--border); font-weight: 400; white-space: nowrap; }
+.trades-table td { padding: 12px 12px; border-bottom: 1px solid rgba(201,168,76,0.08); font-size: 12px; background: var(--white); white-space: nowrap; }
+.trades-table tbody tr:last-child td { border-bottom: none; }
+.t-pair { font-weight: 500; }
+.t-buy { color: #1A6B3C; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; }
+.t-sell { color: #8B1E1E; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; }
+.t-pos { color: #1A6B3C; font-family: 'DM Mono', monospace; font-size: 11px; }
+.t-neg { color: #8B1E1E; font-family: 'DM Mono', monospace; font-size: 11px; }
+.t-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink3); }
+.badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; font-weight: 500; }
+.badge-win { background: rgba(26,107,60,0.1); color: #1A6B3C; border: 1px solid rgba(26,107,60,0.2); }
+.badge-loss { background: rgba(139,30,30,0.08); color: #8B1E1E; border: 1px solid rgba(139,30,30,0.15); }
+
+/* STORY */
+.story-pull { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.8rem, 7vw, 3rem); line-height: 1.1; color: var(--gold); padding-left: 20px; border-left: 3px solid var(--gold); margin-bottom: 28px; letter-spacing: 0.03em; }
+.story-text p { font-size: 15px; line-height: 1.8; color: var(--ink3); margin-bottom: 16px; font-weight: 300; }
+.story-text p strong { color: var(--ink); font-weight: 500; }
+.story-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 32px; }
+.sn-cell { background: var(--cream2); padding: 18px 16px; }
+.sn-num { font-family: 'Bebas Neue', sans-serif; font-size: 34px; color: var(--gold); line-height: 1; }
+.sn-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink3); margin-top: 4px; }
+
+/* WHY */
+.why-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.why-cell { background: var(--white); padding: 22px 18px; position: relative; transition: background 0.2s; }
+.why-cell:hover { background: var(--gold-pale); }
+.why-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--cream3); line-height: 1; position: absolute; top: 14px; right: 18px; }
+.why-cell h3 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--ink); margin-bottom: 8px; line-height: 1.1; padding-right: 36px; }
+.why-cell p { font-size: 13px; line-height: 1.7; color: var(--ink3); font-weight: 300; }
+
+/* CTA */
+.cta-section { background: var(--ink); padding: 52px 20px; }
+.cta-inner { max-width: 1200px; margin: 0 auto; }
+.cta-left .section-label { color: var(--gold); }
+.cta-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem, 9vw, 3.2rem); line-height: 1; color: var(--cream); margin-bottom: 12px; letter-spacing: 0.02em; }
+.cta-title em { color: var(--gold-light); font-style: normal; }
+.cta-sub { font-size: 14px; color: rgba(245,239,216,0.45); line-height: 1.7; font-weight: 300; margin-bottom: 28px; }
+.email-form { display: flex; flex-direction: column; gap: 10px; }
+.email-input { width: 100%; background: rgba(253,250,243,0.06); border: 1px solid rgba(201,168,76,0.25); border-radius: 2px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 16px; color: var(--cream); outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+.email-input::placeholder { color: rgba(245,239,216,0.25); }
+.email-input:focus { border-color: var(--gold); }
+.email-btn { width: 100%; background: var(--gold); color: var(--ink); border: none; border-radius: 2px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; min-height: 52px; -webkit-appearance: none; }
+.email-btn:hover { background: var(--gold-light); }
+.form-note { font-size: 11px; color: rgba(245,239,216,0.25); font-family: 'DM Mono', monospace; letter-spacing: 0.5px; }
+
+/* FOOTER */
+footer { background: var(--ink); border-top: 1px solid rgba(201,168,76,0.1); padding: 28px 20px; text-align: center; }
+.footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--gold); margin-bottom: 10px; }
+.footer-note { font-size: 10px; color: rgba(245,239,216,0.2); font-family: 'DM Mono', monospace; line-height: 1.6; }
+
+/* FADE IN */
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ── TABLET 640px+ ── */
+@media (min-width: 640px) {
+  nav { padding: 16px 32px; }
+  .hero { padding: 96px 32px 52px; }
+  .section { padding: 64px 32px; }
+  .divider { margin: 0 32px; }
+  .vsl-section, .cta-section { padding: 64px 32px; }
+  .hero-actions { flex-direction: row; align-items: center; }
+  .btn-primary { width: auto; }
+  .why-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  footer { padding: 28px 32px; }
+}
+
+/* ── DESKTOP 1024px+ ── */
+@media (min-width: 1024px) {
+  nav { padding: 20px 48px; }
+  .nav-links { display: flex; }
+  .nav-cta { display: none; }
+  .nav-cta-desktop { display: block; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; color: var(--ink) !important; background: var(--gold); padding: 10px 20px; border-radius: 2px; transition: background 0.2s; white-space: nowrap; }
+  .nav-cta-desktop:hover { background: var(--gold-light); }
+
+  .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 80px; padding: 120px 48px 80px; max-width: 1200px; margin: 0 auto; }
+  .hero h1 { font-size: clamp(3.5rem, 5vw, 5.2rem); margin-bottom: 24px; }
+  .hero-sub { margin-bottom: 36px; }
+  .hero-actions { flex-direction: row; gap: 20px; margin-bottom: 0; }
+  .btn-primary { width: auto; }
+
+  .section { padding: 96px 48px; }
+  .divider { margin: 0 48px; }
+  .vsl-section { padding: 96px 48px; }
+  .cta-section { padding: 96px 48px; }
+
+  .why-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Story two-col */
+  .story-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .story-numbers { margin-bottom: 0; }
+
+  /* CTA two-col */
+  .cta-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .cta-sub { margin-bottom: 0; }
+
+  footer { display: flex; justify-content: space-between; align-items: center; padding: 32px 48px; text-align: left; }
+  .footer-logo { margin-bottom: 0; }
+  .footer-note { text-align: right; max-width: 400px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Zedd<em>Futures</em></div>
+  <div class="nav-links">
+    <a href="#performance">Performance</a>
+    <a href="#story">The Story</a>
+    <a href="#why">Why Copy</a>
+  </div>
+  <a href="#join" class="nav-cta">Get Access</a>
+  <a href="#join" class="nav-cta-desktop">Get Access</a>
+</nav>
+
+<!-- HERO -->
+<section style="overflow:hidden;">
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow">Verified · Live Account · EUR/GBP</div>
+      <h1>I Blew<br>Two Accounts.<br><em>Then I</em><br><span class="stroke">Figured It Out.</span></h1>
+      <p class="hero-sub">No mentor. No shortcuts. Just <strong>two blown accounts</strong> and the discipline to rebuild from zero. Now every trade I take runs live in your account — automatically.</p>
+      <div class="hero-actions">
+        <a href="#join" class="btn-primary">
+          Copy My Trades
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#performance" class="btn-ghost">See the track record</a>
+      </div>
+    </div>
+    <div>
+      <div class="hero-stat-card">
+        <div class="hsc-label">Account Gain</div>
+        <div class="hsc-value" id="hero-gain">—</div>
+        <div class="hsc-sub">Myfxbook verified · live account</div>
+      </div>
+      <div class="verified-tag">
+        <div class="verified-dot"></div>
+        Live · Myfxbook Connected
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VSL -->
+<section class="vsl-section" id="watch">
+  <div class="section-inner fade-in">
+    <div class="section-label">Watch First</div>
+    <div class="section-title" style="color:var(--cream)">Before You Copy,<br><em>Watch This.</em></div>
+    <p class="vsl-subtitle">Two minutes. No pitch. Just the real story of how I went from blown accounts to a verified edge — and why copy trading actually works when the trader has nothing to hide.</p>
+    <div id="vsl-container">
+      <div class="vsl-frame" id="vsl-placeholder">
+        <div class="vsl-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+      <div class="vsl-label" id="vsl-label">Set your video URL from the admin panel</div>
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE -->
+<section class="section fade-in" id="performance">
+  <div class="section-inner">
+    <div class="section-label">Live Numbers · Myfxbook Verified</div>
+    <div class="section-title">The Track Record<br>Is <em>Public.</em></div>
+    <div class="stats-grid">
+      <div class="stat-cell">
+        <div class="label">Total Gain</div>
+        <div class="value gold" id="s-gain">—</div>
+        <div class="suffix">Compounding since account open · Myfxbook verified</div>
+      </div>
+      <div class="stat-cell wide">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <div class="verified-dot" style="background:var(--gold); flex-shrink:0;"></div>
+          <span style="font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); line-height:1.7;">Third-party verified via Myfxbook · No edited screenshots · Full history always visible</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- RECENT TRADES -->
+<section class="section fade-in" id="trades">
+  <div class="section-inner">
+    <div class="section-label">Last 5 Closed Trades · Live</div>
+    <div class="section-title">Recent<br><em>Executions.</em></div>
+    <div class="trades-wrap">
+      <table class="trades-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Symbol</th>
+            <th>Dir</th>
+            <th>Pips</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody id="trades-body">
+          <tr><td colspan="5" style="text-align:center; padding:32px; color:var(--ink3); font-family:'DM Mono',monospace; font-size:11px; letter-spacing:1px;">Loading live trades...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px; text-align:right;">
+      <a href="/public" style="font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); text-decoration:none; border-bottom:1px solid var(--border2); padding-bottom:2px;">View Full Trade History →</a>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- STORY -->
+<section class="section fade-in" id="story">
+  <div class="section-inner">
+    <div class="story-layout">
+      <div>
+        <div class="section-label">The Backstory</div>
+        <div class="section-title" style="margin-bottom:20px;">Not a<br>Highlight Reel.<br>A <em>Process.</em></div>
+        <div class="story-numbers">
+          <div class="sn-cell"><div class="sn-num">2×</div><div class="sn-label">Accounts Blown</div></div>
+          <div class="sn-cell"><div class="sn-num">6mo</div><div class="sn-label">To Rebuild</div></div>
+          <div class="sn-cell"><div class="sn-num">0</div><div class="sn-label">Mentors or Signals</div></div>
+          <div class="sn-cell"><div class="sn-num">1</div><div class="sn-label">Verified Live Edge</div></div>
+        </div>
+      </div>
+      <div class="story-text">
+        <div class="story-pull">"Lost it twice. Rebuilt it alone. Now you can copy every move."</div>
+        <p>I paid real money to someone who promised passive income. I got nothing back but a lesson. Then I traded myself — averaging down, holding losers, running martingale until it <strong>wiped the account entirely.</strong></p>
+        <p>Most people quit after the first blow-up. I quit after the second. For a week. Then I <strong>went back to the charts</strong> and started treating it like a craft instead of a lottery.</p>
+        <p>Six months of rebuilding. No shortcuts. Just structure, patience, and a ruleset I could actually follow under pressure. <strong>That's what you're copying — not a persona, a process.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- WHY -->
+<section class="section fade-in" id="why">
+  <div class="section-inner">
+    <div class="section-label">Why ZeddFutures</div>
+    <div class="section-title">Six Reasons<br>This <em>Works.</em></div>
+    <div class="why-grid">
+      <div class="why-cell"><div class="why-num">01</div><h3>Third-Party Verified</h3><p>Every trade, every result — verified on Myfxbook. Full history, always public. No edited screenshots, no cherry-picked wins.</p></div>
+      <div class="why-cell"><div class="why-num">02</div><h3>One Pair. One Edge.</h3><p>GBPUSD and EURUSD only. No trend-chasing, no pair-jumping. A single edge executed with precision every time.</p></div>
+      <div class="why-cell"><div class="why-num">03</div><h3>Institutional Logic</h3><p>Built on SMT divergence and market structure — the same concepts institutions use. Not retail indicators. Not guesswork.</p></div>
+      <div class="why-cell"><div class="why-num">04</div><h3>No Martingale. Ever.</h3><p>Learned that lesson the expensive way. Fixed position sizing on every trade. Your account doesn't blow up chasing a losing position.</p></div>
+      <div class="why-cell"><div class="why-num">05</div><h3>Total Transparency</h3><p>Follow the full journey on @zeddfutures. The wins, the misses, the reasoning — not a curated highlight reel.</p></div>
+      <div class="why-cell"><div class="why-num">06</div><h3>Performance Fees Only</h3><p>Zero access fees. Zero signal subscriptions. You only pay when you're in profit. No results, no cost.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section fade-in" id="join">
+  <div class="cta-inner">
+    <div class="cta-layout">
+      <div class="cta-left">
+        <div class="section-label">Get Access</div>
+        <div class="cta-title">Ready to Copy<br><em>Live Trades?</em></div>
+        <p class="cta-sub">Drop your email. Access our onboarding page to gain entry into the copytrading service. No spam, no scripts.</p>
+      </div>
+      <div>
+        <div class="email-form">
+          <input class="email-input" type="email" id="email-input" placeholder="your@email.com" autocomplete="email">
+          <button class="email-btn" onclick="handleSubmit()">Get Access →</button>
+          <div class="form-note">No spam · Unsubscribe anytime</div>
+        </div>
+        <div id="form-success" style="display:none; margin-top:16px; font-family:'DM Mono',monospace; font-size:12px; color:var(--gold); letter-spacing:1px;">✓ Subscribed. Redirecting to onboarding...</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">ZeddFutures</div>
+  <div class="footer-note">High risk warning: Forex trading carries significant risk and is not suitable for all investors. Past performance does not guarantee future results. Trade responsibly.</div>
+</footer>
+
+<script>
+async function loadStats() {
+  try {
+    const res = await fetch('/.netlify/functions/myfxbook');
+    if (!res.ok) throw new Error();
+    const d = await res.json();
+    if (d.error) throw new Error();
+    const gain = parseFloat(d.gain);
+    const gainStr = (gain >= 0 ? '+' : '') + gain.toFixed(1) + '%';
+    document.getElementById('hero-gain').textContent = gainStr;
+    document.getElementById('s-gain').textContent = gainStr;
+    if (d.trades && d.trades.length) {
+      document.getElementById('trades-body').innerHTML = d.trades.slice(0, 5).map(t => {
+        const profit = parseFloat(t.profit);
+        const pips = parseFloat(t.pips);
+        const isBuy = !(t.action || '').toLowerCase().includes('sell');
+        const isWin = profit >= 0;
+        return `<tr>
+          <td class="t-date">${(t.closeTime || t.openTime || '—').split(' ')[0]}</td>
+          <td class="t-pair">${t.symbol || '—'}</td>
+          <td class="${isBuy ? 't-buy' : 't-sell'}">${isBuy ? 'LONG' : 'SHORT'}</td>
+          <td class="${pips >= 0 ? 't-pos' : 't-neg'}">${pips >= 0 ? '+' : ''}${pips.toFixed(1)}</td>
+          <td><span class="badge ${isWin ? 'badge-win' : 'badge-loss'}">${isWin ? 'WIN' : 'LOSS'}</span></td>
+        </tr>`;
+      }).join('');
+    }
+  } catch(e) { /* leave as dashes */ }
+}
+
+async function loadVSL() {
+  const binId = 'PASTE_YOUR_BIN_ID_HERE';
+  const binKey = 'PASTE_YOUR_ACCESS_KEY_HERE';
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, { headers: { 'X-Access-Key': binKey } });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const url = data.record?.vsl_url;
+    if (url && url.trim()) {
+      const container = document.getElementById('vsl-container');
+      const iframe = document.createElement('iframe');
+      iframe.src = url.trim();
+      iframe.style.cssText = 'width:100%; aspect-ratio:16/9; border-radius:4px; border:1px solid rgba(201,168,76,0.2); display:block;';
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+      iframe.setAttribute('allowfullscreen', '');
+      container.innerHTML = '';
+      container.appendChild(iframe);
+    }
+  } catch(e) { /* placeholder stays */ }
+}
+
+async function handleSubmit() {
+  const inp = document.getElementById('email-input');
+  const btn = document.querySelector('.email-btn');
+  const email = inp.value.trim();
+  if (!email || !email.includes('@')) { inp.style.borderColor = 'var(--gold)'; return; }
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  try {
+    const res = await fetch('/.netlify/functions/subscribe', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      document.querySelector('.email-form').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+      setTimeout(() => { window.location.href = 'https://zeddfuturesonboarding.netlify.app/'; }, 1200);
+    } else { btn.textContent = 'Get Access →'; btn.disabled = false; }
+  } catch(e) { window.location.href = 'https://zeddfuturesonboarding.netlify.app/'; }
+}
+
+document.getElementById('email-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleSubmit();
+  document.getElementById('email-input').style.borderColor = '';
+});
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.06 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+loadStats();
+loadVSL();
+</script>
+</body>
+</html>
