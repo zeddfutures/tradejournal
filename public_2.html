@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZeddFutures — Live Trade History</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #FDFAF3; --surface: #FFFFFF; --surface2: #F5EFD8; --surface3: #EDE4C4;
+  --border: rgba(201,168,76,0.18); --border2: rgba(201,168,76,0.32);
+  --accent: #C9A84C; --accent-dim: rgba(201,168,76,0.1);
+  --red: #A32020; --red-dim: rgba(163,32,32,0.08);
+  --green: #1A6B3C; --green-dim: rgba(26,107,60,0.08);
+  --text: #1A1711; --text2: #6B6040; --text3: #A89860;
+  --radius: 4px;
+}
+html { font-size: 14px; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOPBAR — mobile base */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(253,250,243,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px; height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-logo { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--accent); letter-spacing: 0.06em; line-height: 1; }
+.topbar-logo span { font-size: 8px; font-family: 'DM Mono'; color: var(--text3); display: block; letter-spacing: 2px; margin-top: 1px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.last-updated { display: none; font-size: 10px; font-family: 'DM Mono'; color: var(--text3); }
+.live-badge { display: flex; align-items: center; gap: 5px; font-size: 9px; font-family: 'DM Mono'; color: #1A6B3C; padding: 4px 8px; background: rgba(26,107,60,0.08); border-radius: 3px; border: 1px solid rgba(26,107,60,0.2); }
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: #1A6B3C; animation: pulse 2s infinite; flex-shrink: 0; }
+.btn-join { background: var(--accent); color: #1A1711; font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; padding: 7px 10px; border-radius: 3px; white-space: nowrap; transition: background 0.2s; }
+.btn-join:hover { background: #E8C96A; }
+
+/* MAIN */
+.main { padding: 20px 16px; }
+
+/* HERO */
+.hero { margin-bottom: 24px; }
+.hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 10vw, 42px); line-height: 1; letter-spacing: 0.03em; margin-bottom: 8px; }
+.hero h1 span { color: var(--accent); }
+.hero p { font-size: 13px; color: var(--text2); line-height: 1.6; max-width: 480px; }
+
+/* STATS ROW */
+.stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.stat-card.c-gold::before { background: var(--accent); }
+.stat-card.c-green::before { background: var(--green); }
+.stat-card.c-red::before { background: var(--red); }
+.stat-card.c-muted::before { background: var(--border2); }
+.stat-label { font-size: 8px; font-family: 'DM Mono'; color: var(--text2); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px; }
+.stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 22px; font-weight: 400; line-height: 1; letter-spacing: 0.03em; }
+.stat-value.green { color: var(--green); }
+.stat-value.red { color: var(--red); }
+.stat-value.gold { color: var(--accent); }
+
+/* BREAKDOWN */
+.breakdown-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.breakdown-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.breakdown-title { font-size: 9px; font-family: 'DM Mono'; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.breakdown-row-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); }
+.breakdown-row-item:last-child { border-bottom: none; }
+.breakdown-key { font-size: 12px; color: var(--text2); }
+.breakdown-bar-wrap { flex: 1; margin: 0 10px; height: 3px; background: rgba(201,168,76,0.15); border-radius: 2px; overflow: hidden; }
+.breakdown-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.6s ease; }
+.breakdown-pct { font-size: 10px; font-family: 'DM Mono'; color: var(--accent); min-width: 32px; text-align: right; }
+.breakdown-wl { font-size: 9px; color: var(--text2); margin-left: 5px; font-family: 'DM Mono'; }
+
+/* FILTERS */
+.filters-bar { display: flex; gap: 6px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+.filter-label { font-size: 9px; font-family: 'DM Mono'; color: var(--text3); letter-spacing: 0.5px; }
+.filter-select { background: var(--surface); color: var(--text2); border: 1px solid var(--border); padding: 6px 8px; border-radius: var(--radius); font-size: 10px; font-family: 'DM Mono'; outline: none; cursor: pointer; transition: 0.15s; appearance: none; -webkit-appearance: none; }
+.filter-select:hover, .filter-select:focus { border-color: var(--border2); color: var(--text); }
+.filter-count { font-size: 9px; font-family: 'DM Mono'; color: var(--text2); margin-left: auto; padding: 4px 8px; background: var(--surface2); border-radius: var(--radius); border: 1px solid var(--border); }
+.btn-clear { padding: 6px 10px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface2); color: var(--text2); font-size: 10px; font-family: 'DM Mono'; cursor: pointer; transition: 0.15s; }
+.btn-clear:hover { color: var(--text); }
+
+/* TABLE */
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; min-width: 480px; }
+thead tr { background: var(--surface2); }
+th { padding: 10px 12px; font-size: 8px; font-family: 'DM Mono'; text-transform: uppercase; color: var(--text3); letter-spacing: 1.5px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; cursor: pointer; user-select: none; transition: color 0.15s; }
+th:hover { color: var(--text2); }
+th.sort-asc::after { content: ' ↑'; color: var(--accent); }
+th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+td { padding: 10px 12px; border-bottom: 1px solid rgba(201,168,76,0.08); font-size: 12px; white-space: nowrap; }
+tbody tr { transition: background 0.1s; }
+tbody tr:hover { background: rgba(201,168,76,0.04); }
+tbody tr:last-child td { border-bottom: none; }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 3px; font-size: 9px; font-family: 'DM Mono'; font-weight: 500; letter-spacing: 0.5px; }
+.badge-win  { background: rgba(26,107,60,0.08); color: #1A6B3C; border: 1px solid rgba(26,107,60,0.2); }
+.badge-loss { background: rgba(163,32,32,0.08); color: #A32020; border: 1px solid rgba(163,32,32,0.15); }
+.badge-be   { background: rgba(201,168,76,0.1); color: var(--accent); border: 1px solid rgba(201,168,76,0.2); }
+.pip-pos  { color: #1A6B3C; font-family: 'DM Mono'; font-size: 11px; }
+.pip-neg  { color: #A32020; font-family: 'DM Mono'; font-size: 11px; }
+.pip-zero { color: var(--text2); font-family: 'DM Mono'; font-size: 11px; }
+.mono { font-family: 'DM Mono'; font-size: 11px; color: var(--text2); }
+
+/* STATE BOX */
+.state-box { text-align: center; padding: 48px 20px; color: var(--text2); }
+.state-box p { font-size: 13px; margin-top: 8px; }
+.loading-spinner { width: 24px; height: 24px; border: 2px solid rgba(201,168,76,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+
+/* CTA BAR */
+.cta-bar { background: #1A1711; border-radius: var(--radius); padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+.cta-bar p { font-size: 13px; color: rgba(237,228,196,0.5); }
+.cta-bar strong { color: #EDE4C4; display: block; font-size: 16px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; margin-bottom: 4px; }
+.btn-cta { background: var(--accent); color: #1A1711; border: none; padding: 14px 20px; border-radius: 3px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: 'DM Sans'; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.15s; min-height: 48px; }
+.btn-cta:hover { background: #E8C96A; }
+
+/* FOOTER */
+.footer { text-align: center; padding: 24px 16px; color: var(--text3); font-size: 10px; font-family: 'DM Mono'; border-top: 1px solid var(--border); margin-top: 32px; background: #1A1711; color: rgba(245,239,216,0.2); }
+
+/* ── TABLET 640px+ ── */
+@media (min-width: 640px) {
+  .topbar { padding: 0 24px; height: 56px; }
+  .last-updated { display: block; }
+  .topbar-logo { font-size: 16px; }
+  .btn-join { font-size: 10px; padding: 8px 14px; }
+  .main { padding: 24px 24px; }
+  .stats-row { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .stat-value { font-size: 26px; }
+  .stat-card { padding: 14px 16px; }
+  .breakdown-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cta-bar { flex-direction: row; align-items: center; justify-content: space-between; }
+  .btn-cta { min-height: auto; }
+}
+
+/* ── DESKTOP 1024px+ ── */
+@media (min-width: 1024px) {
+  .topbar { padding: 0 32px; }
+  .main { max-width: 1200px; margin: 0 auto; padding: 32px 32px; }
+  .hero h1 { font-size: 42px; }
+  .stats-row { grid-template-columns: repeat(7, 1fr); }
+  .stat-value { font-size: 24px; }
+  .breakdown-row { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="topbar-logo">ZEDDFUTURES <span>LIVE PERFORMANCE</span></div>
+  <div class="topbar-right">
+    <div class="last-updated" id="last-updated"></div>
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <a href="https://zeddfuturesonboarding.netlify.app/" target="_blank" class="btn-join">Start Copying →</a>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="hero">
+    <h1>Every Trade.<br><span>On Record.</span></h1>
+    <p>This is the full, unfiltered history from my live account. No cherry-picking, no demo trades, no edits. Automatically updated after every close.</p>
+  </div>
+
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card c-muted"><div class="stat-label">Loading</div><div class="stat-value" style="color:var(--text3)">—</div></div>
+  </div>
+
+  <div class="breakdown-row" id="breakdown-row"></div>
+
+  <div class="filters-bar">
+    <span class="filter-label">FILTER</span>
+    <select class="filter-select" id="f-pair" onchange="applyFilters()">
+      <option value="">All Pairs</option>
+      <option value="GBPUSD">GBPUSD</option>
+      <option value="EURUSD">EURUSD</option>
+    </select>
+    <select class="filter-select" id="f-session" onchange="applyFilters()">
+      <option value="">All Sessions</option>
+      <option value="LONDON">London</option>
+      <option value="NY">New York</option>
+      <option value="ASIA">Asia</option>
+    </select>
+    <select class="filter-select" id="f-dir" onchange="applyFilters()">
+      <option value="">All Directions</option>
+      <option value="BUY">Long</option>
+      <option value="SELL">Short</option>
+    </select>
+    <select class="filter-select" id="f-status" onchange="applyFilters()">
+      <option value="">All Results</option>
+      <option value="WIN">Wins</option>
+      <option value="LOSS">Losses</option>
+      <option value="BE">Break Even</option>
+    </select>
+    <button class="btn-clear" onclick="clearFilters()">Clear</button>
+    <div class="filter-count" id="filter-count">— trades</div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('date')" id="th-date">Date</th>
+            <th onclick="sortBy('pair')" id="th-pair">Pair</th>
+            <th onclick="sortBy('dir')" id="th-dir">Dir</th>
+            <th onclick="sortBy('session')" id="th-session">Session</th>
+            <th>Entry</th>
+            <th>Exit</th>
+            <th>Pips</th>
+            <th onclick="sortBy('lots')" id="th-lots">Lots</th>
+            <th onclick="sortBy('status')" id="th-status">Result</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="9"><div class="state-box"><div class="loading-spinner"></div><p>Loading trades...</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="cta-bar">
+    <div>
+      <strong>Copy Every Trade I Make.</strong>
+      <p>Join ZeddFutures copy trading. Every trade I take executes automatically in your account — in real time.</p>
+    </div>
+    <a class="btn-cta" href="https://zeddfuturesonboarding.netlify.app/" target="_blank">Join Copy Trading →</a>
+  </div>
+
+</main>
+
+<div class="footer">
+  @zeddfutures · Live account · Myfxbook verified · Past performance does not guarantee future results
+</div>
+
+<script>
+let trades = [];
+let sortKey = 'date';
+let sortDir = 'desc';
+let activeFilters = { pair:'', session:'', dir:'', status:'' };
+
+const JSONBIN_BIN_ID = 'PASTE_YOUR_BIN_ID_HERE';
+const JSONBIN_PUBLIC_KEY = 'PASTE_YOUR_ACCESS_KEY_HERE';
+
+async function loadTrades() {
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+      headers: { 'X-Access-Key': JSONBIN_PUBLIC_KEY }
+    });
+    if (!res.ok) throw new Error('Failed to load');
+    const data = await res.json();
+    trades = (data.record?.trades || []).map(normalizeTrade);
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Singapore'}) + ' SGT';
+    render();
+  } catch(e) {
+    document.getElementById('tbody').innerHTML = `<tr><td colspan="9"><div class="state-box"><p>Could not load trades. Try again shortly.</p></div></td></tr>`;
+  }
+}
+
+function normalizeTrade(t) {
+  return {
+    id: t.id || Math.random(),
+    date: t.date || '', pair: t.pair || '', dir: t.dir || 'BUY',
+    time: t.time || '', entry: t.entry || '', exit: t.exit || '',
+    lots: t.lots || '', session: t.session || '', status: t.status || 'WIN',
+  };
+}
+
+function calcPips(t) {
+  const e = parseFloat(t.entry), x = parseFloat(t.exit);
+  if (isNaN(e) || isNaN(x) || e === 0 || x === 0) return null;
+  const multiplier = (t.pair === 'GBPUSD' || t.pair === 'EURUSD') ? 10000 : 100;
+  let pips = (x - e) * multiplier;
+  if (t.dir === 'SELL') pips = -pips;
+  if (t.status === 'BE') return 0;
+  return Math.round(pips * 10) / 10;
+}
+
+function winRateOf(arr) {
+  const decided = arr.filter(t => t.status === 'WIN' || t.status === 'LOSS');
+  if (!decided.length) return 0;
+  return Math.round(arr.filter(t => t.status === 'WIN').length / decided.length * 100);
+}
+
+function getStreak() {
+  const sorted = [...trades].sort((a,b) => new Date(b.date) - new Date(a.date));
+  const decided = sorted.filter(t => t.status === 'WIN' || t.status === 'LOSS');
+  if (!decided.length) return { count: 0, dir: '' };
+  const dir = decided[0].status === 'WIN' ? 'W' : 'L';
+  let count = 0;
+  for (let t of decided) {
+    if ((t.status === 'WIN' && dir === 'W') || (t.status === 'LOSS' && dir === 'L')) count++;
+    else break;
+  }
+  return { count, dir };
+}
+
+function renderStats() {
+  const all = trades;
+  const w  = all.filter(t => t.status === 'WIN').length;
+  const l  = all.filter(t => t.status === 'LOSS').length;
+  const be = all.filter(t => t.status === 'BE').length;
+  const wr = winRateOf(all);
+  const totalPips = all.reduce((sum, t) => { const p = calcPips(t); return sum + (p || 0); }, 0);
+  const avgPips   = all.length ? Math.round(totalPips / all.length * 10) / 10 : 0;
+  const streak    = getStreak();
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card c-green"><div class="stat-label">WINS</div><div class="stat-value green">${w}</div></div>
+    <div class="stat-card c-red"><div class="stat-label">LOSSES</div><div class="stat-value red">${l}</div></div>
+    <div class="stat-card c-muted"><div class="stat-label">BREAK EVEN</div><div class="stat-value" style="color:var(--text2)">${be}</div></div>
+    <div class="stat-card c-gold"><div class="stat-label">WIN RATE</div><div class="stat-value gold">${wr}%</div></div>
+    <div class="stat-card c-${totalPips>=0?'green':'red'}"><div class="stat-label">TOTAL PIPS</div><div class="stat-value ${totalPips>=0?'green':'red'}">${totalPips>0?'+':''}${totalPips}</div></div>
+    <div class="stat-card c-muted"><div class="stat-label">AVG PIPS</div><div class="stat-value ${avgPips>=0?'green':'red'}">${avgPips>0?'+':''}${avgPips}</div></div>
+    <div class="stat-card c-${streak.dir==='W'?'green':'red'}"><div class="stat-label">STREAK</div><div class="stat-value ${streak.dir==='W'?'green':'red'}">${streak.count > 0 ? streak.dir + streak.count : '—'}</div></div>
+  `;
+
+  const pairs    = ['GBPUSD','EURUSD'];
+  const sessions = ['LONDON','NY','ASIA'];
+  const dirs     = [{key:'BUY',label:'Long'},{key:'SELL',label:'Short'}];
+
+  const pairHtml = pairs.map(p => {
+    const pt = all.filter(t => t.pair === p);
+    const wr2 = winRateOf(pt); const w2 = pt.filter(t => t.status === 'WIN').length; const l2 = pt.filter(t => t.status === 'LOSS').length;
+    return `<div class="breakdown-row-item"><span class="breakdown-key">${p}</span><div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:${wr2}%"></div></div><span class="breakdown-pct">${wr2}%</span><span class="breakdown-wl">${w2}W/${l2}L</span></div>`;
+  }).join('');
+  const sessionHtml = sessions.map(s => {
+    const st = all.filter(t => t.session === s);
+    const wr2 = winRateOf(st); const w2 = st.filter(t => t.status === 'WIN').length; const l2 = st.filter(t => t.status === 'LOSS').length;
+    return `<div class="breakdown-row-item"><span class="breakdown-key">${s}</span><div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:${wr2}%"></div></div><span class="breakdown-pct">${wr2}%</span><span class="breakdown-wl">${w2}W/${l2}L</span></div>`;
+  }).join('');
+  const dirHtml = dirs.map(d => {
+    const dt = all.filter(t => t.dir === d.key);
+    const wr2 = winRateOf(dt); const w2 = dt.filter(t => t.status === 'WIN').length; const l2 = dt.filter(t => t.status === 'LOSS').length;
+    return `<div class="breakdown-row-item"><span class="breakdown-key">${d.label}</span><div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:${wr2}%"></div></div><span class="breakdown-pct">${wr2}%</span><span class="breakdown-wl">${w2}W/${l2}L</span></div>`;
+  }).join('');
+
+  document.getElementById('breakdown-row').innerHTML = `
+    <div class="breakdown-card"><div class="breakdown-title">BY PAIR</div>${pairHtml}</div>
+    <div class="breakdown-card"><div class="breakdown-title">BY SESSION</div>${sessionHtml}</div>
+    <div class="breakdown-card"><div class="breakdown-title">BY DIRECTION</div>${dirHtml}</div>
+  `;
+}
+
+function getFiltered() {
+  return trades.filter(t => {
+    if (activeFilters.pair    && t.pair    !== activeFilters.pair)    return false;
+    if (activeFilters.session && t.session !== activeFilters.session) return false;
+    if (activeFilters.dir     && t.dir     !== activeFilters.dir)     return false;
+    if (activeFilters.status  && t.status  !== activeFilters.status)  return false;
+    return true;
+  }).sort((a, b) => {
+    let av = a[sortKey] || '', bv = b[sortKey] || '';
+    if (sortKey === 'date') { av = new Date(a.date); bv = new Date(b.date); }
+    if (sortKey === 'lots') { av = parseFloat(a.lots)||0; bv = parseFloat(b.lots)||0; }
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortKey = key; sortDir = 'desc'; }
+  renderTable();
+}
+
+function applyFilters() {
+  activeFilters.pair    = document.getElementById('f-pair').value;
+  activeFilters.session = document.getElementById('f-session').value;
+  activeFilters.dir     = document.getElementById('f-dir').value;
+  activeFilters.status  = document.getElementById('f-status').value;
+  renderTable();
+}
+
+function clearFilters() {
+  activeFilters = { pair:'', session:'', dir:'', status:'' };
+  ['f-pair','f-session','f-dir','f-status'].forEach(id => document.getElementById(id).value = '');
+  renderTable();
+}
+
+function renderTable() {
+  const filtered = getFiltered();
+  document.getElementById('filter-count').textContent = filtered.length + ' trade' + (filtered.length === 1 ? '' : 's');
+
+  ['date','pair','dir','session','lots','status'].forEach(k => {
+    const el = document.getElementById('th-' + k);
+    if (!el) return;
+    el.classList.remove('sort-asc','sort-desc');
+    if (sortKey === k) el.classList.add('sort-' + sortDir);
+  });
+
+  if (!filtered.length) {
+    document.getElementById('tbody').innerHTML = `<tr><td colspan="9"><div class="state-box"><p>No trades match this filter.</p></div></td></tr>`;
+    return;
+  }
+
+  document.getElementById('tbody').innerHTML = filtered.map(t => {
+    const pips = calcPips(t);
+    const pipHtml = pips === null ? `<span class="pip-zero">—</span>` :
+      pips > 0 ? `<span class="pip-pos">+${pips}</span>` :
+      pips < 0 ? `<span class="pip-neg">${pips}</span>` :
+      `<span class="pip-zero">0</span>`;
+    const badge = t.status === 'WIN' ? 'badge-win' : t.status === 'LOSS' ? 'badge-loss' : 'badge-be';
+    const formattedDate = t.date ? t.date.split('-').reverse().join('/') : '—';
+    const dirLabel = t.dir === 'SELL' ? 'SHORT' : 'LONG';
+    return `<tr>
+      <td class="mono">${formattedDate}</td>
+      <td style="font-weight:500; font-size:12px;">${t.pair || '—'}</td>
+      <td><span style="font-size:10px;font-family:'DM Mono';color:${t.dir==='SELL'?'#A32020':'#1A6B3C'};font-weight:500;">${dirLabel}</span></td>
+      <td class="mono">${t.session || '—'}</td>
+      <td class="mono">${t.entry || '—'}</td>
+      <td class="mono">${t.exit || '—'}</td>
+      <td>${pipHtml}</td>
+      <td class="mono">${t.lots || '—'}</td>
+      <td><span class="badge ${badge}">${t.status}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function render() { renderStats(); renderTable(); }
+
+loadTrades();
+setInterval(loadTrades, 5 * 60 * 1000);
+</script>
+</body>
+</html>
