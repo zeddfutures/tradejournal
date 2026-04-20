@@ -11,3 +11,11 @@
   from = "/public"
   to = "/public.html"
   status = 200
+
+[functions."daily-briefing"]
+  schedule = "0 23 * * *"
+
+[[redirects]]
+  from = "/api/briefing"
+  to = "/.netlify/functions/briefing"
+  status = 200
