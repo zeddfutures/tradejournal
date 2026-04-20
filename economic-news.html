@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morning Briefing — ZeddFutures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0b;
+    --bg-card: #131316;
+    --bg-elev: #1a1a1e;
+    --border: #26262c;
+    --border-strong: #36363e;
+    --text: #e8e8ea;
+    --text-muted: #8a8a93;
+    --text-dim: #5a5a63;
+    --green: #4ade80;
+    --green-bg: rgba(74, 222, 128, 0.1);
+    --red: #f87171;
+    --red-bg: rgba(248, 113, 113, 0.1);
+    --amber: #fbbf24;
+    --amber-bg: rgba(251, 191, 36, 0.1);
+    --blue: #60a5fa;
+    --accent: #f5f5dc;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .serif { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
+
+  /* ── container ── */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+
+  /* ── header ── */
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .brand-mark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .brand-divider {
+    color: var(--text-dim);
+    font-size: 20px;
+  }
+
+  .brand-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding-bottom: 4px;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .header-meta .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .refresh-btn {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 6px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+
+  .refresh-btn:hover {
+    background: var(--bg-elev);
+    border-color: var(--text-dim);
+  }
+
+  /* ── section label ── */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-label .meta {
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0.05em;
+    font-size: 10px;
+  }
+
+  /* ── market context ── */
+  .market-context {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .context-row-1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .context-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .risk-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    padding: 5px 12px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .risk-pill.off { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+  .risk-pill.on { background: var(--green-bg); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+  .risk-pill.neutral { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .metric {
+    padding: 14px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--bg-elev);
+  }
+
+  .metric:last-child { border-right: none; }
+
+  .metric-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .metric-delta {
+    font-size: 11px;
+    font-weight: 400;
+  }
+
+  .up { color: var(--green); }
+  .down { color: var(--red); }
+
+  .context-narrative {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    border-left: 2px solid var(--accent);
+    padding-left: 16px;
+    margin-top: 4px;
+  }
+
+  /* ── overnight moves ── */
+  .overnight {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .overnight-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+
+  .overnight-card .ticker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .overnight-card .price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .overnight-card .change {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* ── correlation ── */
+  .correlation {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 28px;
+  }
+
+  .corr-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  .corr-table th {
+    color: var(--text-dim);
+    font-weight: 400;
+    text-align: center;
+    padding: 6px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  .corr-table td {
+    padding: 10px 6px;
+    text-align: center;
+    border-radius: 4px;
+  }
+
+  .corr-table td.label {
+    color: var(--text-muted);
+    text-align: left;
+    padding-left: 10px;
+    font-weight: 500;
+  }
+
+  .corr-table td.diag {
+    background: var(--bg-elev);
+    color: var(--text-dim);
+  }
+
+  .corr-very-pos { background: rgba(74, 222, 128, 0.25); color: #86efac; }
+  .corr-pos { background: rgba(74, 222, 128, 0.12); color: #a7f3d0; }
+  .corr-neutral { background: rgba(138, 138, 147, 0.15); color: var(--text-muted); }
+  .corr-neg { background: rgba(248, 113, 113, 0.12); color: #fca5a5; }
+  .corr-very-neg { background: rgba(248, 113, 113, 0.25); color: #fca5a5; }
+
+  .corr-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.55;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── instruments ── */
+  .instruments {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .instrument {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .instrument::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--text-dim);
+    transition: background 0.15s;
+  }
+
+  .instrument.bull::before { background: var(--green); }
+  .instrument.bear::before { background: var(--red); }
+  .instrument.neutral::before { background: var(--amber); }
+
+  .instrument:hover {
+    border-color: var(--border-strong);
+    background: var(--bg-elev);
+  }
+
+  .inst-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .inst-ticker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .bias-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .bias-pill.bull { background: var(--green-bg); color: var(--green); }
+  .bias-pill.bear { background: var(--red-bg); color: var(--red); }
+  .bias-pill.neutral { background: var(--amber-bg); color: var(--amber); }
+
+  .inst-summary {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+
+  .inst-alignment {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .align-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  .align-label {
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .align-value {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .inst-expand {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* ── expanded view modal ── */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+  }
+
+  .modal-backdrop.active { display: flex; }
+
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    max-width: 720px;
+    width: 100%;
+    padding: 32px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .modal-close {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  .modal-section {
+    margin-bottom: 24px;
+  }
+
+  .modal-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .modal-section p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .article-ref {
+    display: block;
+    padding: 12px 14px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+
+  .article-ref:hover {
+    border-color: var(--border-strong);
+    background: #22222a;
+  }
+
+  .article-headline {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+
+  .article-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── mag7 ── */
+  .mag7 {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 28px;
+  }
+
+  .mag7-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .mag7-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .earnings-item {
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+
+  .earnings-item:first-child { border-top: none; padding-top: 0; }
+
+  .earnings-ticker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+
+  .earnings-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .earnings-body {}
+
+  .earnings-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  .stat {
+    color: var(--text);
+  }
+
+  .stat span {
+    color: var(--text-dim);
+    margin-right: 5px;
+  }
+
+  .interpretation {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    padding: 12px 14px;
+    background: var(--bg-elev);
+    border-left: 2px solid var(--blue);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .interpretation-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+
+  /* ── calendar ── */
+  .calendar {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 28px;
+  }
+
+  .calendar-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .cal-event {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .cal-event:first-of-type { border-top: none; }
+
+  .cal-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .cal-event-name {
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .cal-fcst {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .impact {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    padding: 4px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .impact.high { background: var(--red-bg); color: var(--red); }
+  .impact.med { background: var(--amber-bg); color: var(--amber); }
+  .impact.low { background: var(--bg-elev); color: var(--text-muted); }
+
+  /* ── headlines ── */
+  .headlines {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 28px;
+  }
+
+  .headlines-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .headline {
+    display: block;
+    padding: 14px 0 14px 16px;
+    border-top: 1px solid var(--border);
+    border-left: 2px solid var(--text-dim);
+    margin-left: 0;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+
+  .headline:hover {
+    background: var(--bg-elev);
+    border-left-color: var(--accent);
+  }
+
+  .headline:first-of-type { border-top: none; }
+  .headline.high { border-left-color: var(--red); }
+  .headline.med { border-left-color: var(--amber); }
+  .headline.low { border-left-color: var(--text-dim); }
+
+  .headline-text {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.45;
+    margin-bottom: 4px;
+  }
+
+  .headline-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .headline-meta .source {
+    color: var(--accent);
+  }
+
+  /* ── signal check ── */
+  .signal-check {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .signal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .signal-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .signal-input-row {
+    display: flex;
+    gap: 8px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .signal-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  .signal-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .signal-btn {
+    background: var(--accent);
+    border: none;
+    color: var(--bg);
+    padding: 10px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+
+  .signal-btn:hover {
+    background: #fff;
+  }
+
+  /* ── footer ── */
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-align: center;
+  }
+
+  /* ── responsive ── */
+  @media (max-width: 800px) {
+    .container { padding: 16px 12px 60px; }
+    .brand-mark { font-size: 26px; }
+    .metrics-row { grid-template-columns: repeat(2, 1fr); }
+    .metric:nth-child(2) { border-right: none; }
+    .metric:nth-child(1), .metric:nth-child(2) { border-bottom: 1px solid var(--border); }
+    .overnight { grid-template-columns: repeat(2, 1fr); }
+    .instruments { grid-template-columns: 1fr; }
+    .earnings-item { grid-template-columns: 1fr; gap: 8px; }
+    .earnings-stats { font-size: 10px; gap: 10px; }
+    .context-narrative { font-size: 15px; }
+    .market-context, .correlation, .calendar, .headlines, .signal-check, .mag7 {
+      padding: 16px 14px;
+    }
+    .context-title, .corr-note, .mag7-title, .calendar-title, .headlines-title, .signal-title {
+      font-size: 20px;
+    }
+    .corr-table { font-size: 11px; }
+    .modal { padding: 20px 16px; }
+    .modal-title { font-size: 22px; }
+    header { align-items: flex-start; }
+    .signal-input-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">ZeddFutures</div>
+    <span class="brand-divider">/</span>
+    <span class="brand-sub">Economic News</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 16px;">
+    <div class="header-meta">
+      <span class="dot"></span>
+      <span id="header-date">Mon 20 Apr 2026 · 07:15 SGT</span>
+    </div>
+    <button class="refresh-btn" onclick="location.reload()">↻ Refresh</button>
+  </div>
+</header>
+
+<!-- MARKET CONTEXT -->
+<div class="market-context">
+  <div class="context-row-1">
+    <div class="context-title">Market context</div>
+    <span class="risk-pill on">Risk-on</span>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric">
+      <div class="metric-label">DXY</div>
+      <div class="metric-value mono">98.42 <span class="metric-delta down">−0.28%</span></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">US 10Y</div>
+      <div class="metric-value mono">4.12% <span class="metric-delta down">−2bp</span></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">VIX</div>
+      <div class="metric-value mono">14.8 <span class="metric-delta down">−3.1%</span></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">WTI</div>
+      <div class="metric-value mono">$72.30 <span class="metric-delta down">−1.4%</span></div>
+    </div>
+  </div>
+
+  <div class="context-narrative">
+    US–Iran ceasefire extension holding into week three, removing a major tail risk from global markets. USD weakness remains the dominant theme as Trump's renewed criticism of Powell raises central bank independence concerns. Oil unwinding war premium, yields drifting lower, equities bid. Week's main event is Wed US CPI.
+  </div>
+</div>
+
+<!-- OVERNIGHT MOVES -->
+<div class="section-label">Overnight moves <span class="meta">since Friday close</span></div>
+<div class="overnight">
+  <div class="overnight-card">
+    <div class="ticker">EURUSD</div>
+    <div class="price mono">1.1765</div>
+    <div class="change up">▲ +0.14%</div>
+  </div>
+  <div class="overnight-card">
+    <div class="ticker">GBPUSD</div>
+    <div class="price mono">1.3612</div>
+    <div class="change up">▲ +0.22%</div>
+  </div>
+  <div class="overnight-card">
+    <div class="ticker">NQ</div>
+    <div class="price mono">20,415</div>
+    <div class="change up">▲ +0.48%</div>
+  </div>
+  <div class="overnight-card">
+    <div class="ticker">ES</div>
+    <div class="price mono">5,862</div>
+    <div class="change up">▲ +0.31%</div>
+  </div>
+</div>
+
+<!-- CORRELATION -->
+<div class="section-label">Correlation matrix <span class="meta">20-day rolling Pearson</span></div>
+<div class="correlation">
+  <table class="corr-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>EU</th>
+        <th>GU</th>
+        <th>NQ</th>
+        <th>ES</th>
+        <th>DXY</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="label">EU</td>
+        <td class="diag">—</td>
+        <td class="corr-very-pos">+0.83</td>
+        <td class="corr-pos">+0.41</td>
+        <td class="corr-pos">+0.38</td>
+        <td class="corr-very-neg">−0.96</td>
+      </tr>
+      <tr>
+        <td class="label">GU</td>
+        <td></td>
+        <td class="diag">—</td>
+        <td class="corr-pos">+0.45</td>
+        <td class="corr-pos">+0.42</td>
+        <td class="corr-very-neg">−0.89</td>
+      </tr>
+      <tr>
+        <td class="label">NQ</td>
+        <td></td>
+        <td></td>
+        <td class="diag">—</td>
+        <td class="corr-very-pos">+0.92</td>
+        <td class="corr-neg">−0.52</td>
+      </tr>
+      <tr>
+        <td class="label">ES</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="diag">—</td>
+        <td class="corr-neg">−0.48</td>
+      </tr>
+      <tr>
+        <td class="label">DXY</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="diag">—</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="corr-note">
+    EU/GU +0.83 and equity/DXY negative both in normal ranges — no decorrelation anomalies. Trade either FX pair; both driven by USD story today.
+  </div>
+</div>
+
+<!-- INSTRUMENTS -->
+<div class="section-label">Instruments <span class="meta">tap card for full analysis</span></div>
+<div class="instruments">
+
+  <div class="instrument bull" onclick="openModal('eurusd')">
+    <div class="inst-header">
+      <span class="inst-ticker">EURUSD</span>
+      <span class="bias-pill bull">Bullish</span>
+    </div>
+    <div class="inst-summary">
+      Holding above 1.1765 on broad USD weakness. Lagarde kept ECB optionality open, markets still priced for 2 rate hikes this year. Ceasefire + Powell criticism double tailwind. 1.1825 key resistance, above opens 1.1925.
+    </div>
+    <div class="inst-alignment">
+      <div class="align-item">
+        <div class="align-label">Long</div>
+        <div class="align-value up">✓ Supported</div>
+      </div>
+      <div class="align-item">
+        <div class="align-label">Short</div>
+        <div class="align-value down">✗ Against</div>
+      </div>
+    </div>
+    <div class="inst-expand">
+      <span>Full analysis</span>
+      <span>→</span>
+    </div>
+  </div>
+
+  <div class="instrument bull" onclick="openModal('gbpusd')">
+    <div class="inst-header">
+      <span class="inst-ticker">GBPUSD</span>
+      <span class="bias-pill bull">Bullish</span>
+    </div>
+    <div class="inst-summary">
+      Bid above 1.36 on USD weakness. BOE repricing toward three 2026 hikes diverges sharply from dovish Fed path. Near-term resistance 1.37, then 1.3870 YTD high. Daily range 100-120 pips offers clean levels.
+    </div>
+    <div class="inst-alignment">
+      <div class="align-item">
+        <div class="align-label">Long</div>
+        <div class="align-value up">✓ Supported</div>
+      </div>
+      <div class="align-item">
+        <div class="align-label">Short</div>
+        <div class="align-value down">✗ Against</div>
+      </div>
+    </div>
+    <div class="inst-expand">
+      <span>Full analysis</span>
+      <span>→</span>
+    </div>
+  </div>
+
+  <div class="instrument bull" onclick="openModal('nq')">
+    <div class="inst-header">
+      <span class="inst-ticker">NQ</span>
+      <span class="bias-pill bull">Bullish</span>
+    </div>
+    <div class="inst-summary">
+      Tech bid as yields ease and ceasefire holds. NVDA +1.2% pre-market. Big earnings week — MSFT, GOOGL Wed, META Thu. 20,415 holding above VWAP. Main risk: hot CPI Wed drives yields higher, pressures duration.
+    </div>
+    <div class="inst-alignment">
+      <div class="align-item">
+        <div class="align-label">Long</div>
+        <div class="align-value up">✓ Supported</div>
+      </div>
+      <div class="align-item">
+        <div class="align-label">Short</div>
+        <div class="align-value down">⚠ Conflict</div>
+      </div>
+    </div>
+    <div class="inst-expand">
+      <span>Full analysis</span>
+      <span>→</span>
+    </div>
+  </div>
+
+  <div class="instrument neutral" onclick="openModal('es')">
+    <div class="inst-header">
+      <span class="inst-ticker">ES</span>
+      <span class="bias-pill neutral">Neutral</span>
+    </div>
+    <div class="inst-summary">
+      Broader tape up but less conviction than NQ. Rotation from energy (oil down on ceasefire) into growth. US CPI Wed is the pivot — hot print could flip bias. Earnings season 72% beat rate so far providing floor.
+    </div>
+    <div class="inst-alignment">
+      <div class="align-item">
+        <div class="align-label">Long</div>
+        <div class="align-value" style="color: var(--amber);">~ Mixed</div>
+      </div>
+      <div class="align-item">
+        <div class="align-label">Short</div>
+        <div class="align-value" style="color: var(--amber);">~ Mixed</div>
+      </div>
+    </div>
+    <div class="inst-expand">
+      <span>Full analysis</span>
+      <span>→</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- MAG7 -->
+<div class="mag7">
+  <div class="mag7-header">
+    <div class="mag7-title">MAG7 earnings</div>
+    <span class="mono" style="font-size: 11px; color: var(--text-muted);">This week</span>
+  </div>
+
+  <div class="earnings-item">
+    <div>
+      <div class="earnings-ticker">MSFT</div>
+      <div class="earnings-date">Wed 22 Apr<br>AMC · 04:30 SGT</div>
+    </div>
+    <div class="earnings-body">
+      <div class="earnings-stats">
+        <div class="stat"><span>EPS est</span>$3.24</div>
+        <div class="stat"><span>Beat rate</span>86% (8Q)</div>
+        <div class="stat"><span>NQ weight</span>6.2%</div>
+        <div class="stat"><span>Avg move</span>±3.8%</div>
+      </div>
+      <div class="interpretation">
+        <div class="interpretation-label">Interpretation</div>
+        Azure AI revenue is the number that moves the stock, not headline EPS. A clean beat on Azure guidance pulls NQ +0.8-1.2% into Thu open. A miss below 28% Azure growth likely drops NQ 1.5%+ on duration concerns. Your NQ positions need a decision before Wed US close — hedge or flatten overnight.
+      </div>
+    </div>
+  </div>
+
+  <div class="earnings-item">
+    <div>
+      <div class="earnings-ticker">GOOGL</div>
+      <div class="earnings-date">Wed 22 Apr<br>AMC · 04:30 SGT</div>
+    </div>
+    <div class="earnings-body">
+      <div class="earnings-stats">
+        <div class="stat"><span>EPS est</span>$2.15</div>
+        <div class="stat"><span>Beat rate</span>75% (8Q)</div>
+        <div class="stat"><span>NQ weight</span>4.1%</div>
+        <div class="stat"><span>Avg move</span>±5.2%</div>
+      </div>
+      <div class="interpretation">
+        <div class="interpretation-label">Interpretation</div>
+        Reports same night as MSFT — combined NQ move can compound. Ad revenue growth and capex guidance are the metrics. Cloud segment comparison with Azure watched closely. Historical post-print volatility higher than MSFT.
+      </div>
+    </div>
+  </div>
+
+  <div class="earnings-item">
+    <div>
+      <div class="earnings-ticker">META</div>
+      <div class="earnings-date">Thu 23 Apr<br>AMC · 04:00 SGT</div>
+    </div>
+    <div class="earnings-body">
+      <div class="earnings-stats">
+        <div class="stat"><span>EPS est</span>$5.42</div>
+        <div class="stat"><span>Beat rate</span>88% (8Q)</div>
+        <div class="stat"><span>NQ weight</span>3.8%</div>
+        <div class="stat"><span>Avg move</span>±7.1%</div>
+      </div>
+      <div class="interpretation">
+        <div class="interpretation-label">Interpretation</div>
+        Highest volatility of the week. AI capex guidance is the market focus — continued heavy spend has been rewarded in 2026. A capex cut would signal slowdown and hit NQ hard. Thursday Asia session volatile.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CALENDAR -->
+<div class="calendar">
+  <div class="calendar-title">Today's calendar</div>
+
+  <div class="cal-event">
+    <div class="cal-time mono">20:30</div>
+    <div>
+      <div class="cal-event-name">Fed Williams speaking</div>
+      <div class="cal-fcst">Dovish tilt expected</div>
+    </div>
+    <div class="impact med">Med</div>
+  </div>
+
+  <div class="cal-event">
+    <div class="cal-time mono">22:00</div>
+    <div>
+      <div class="cal-event-name">US Leading Indicators (MoM)</div>
+      <div class="cal-fcst">Fcst −0.1%</div>
+    </div>
+    <div class="impact low">Low</div>
+  </div>
+
+  <div class="cal-event">
+    <div class="cal-time mono">Wed 20:30</div>
+    <div>
+      <div class="cal-event-name">US CPI (MoM)</div>
+      <div class="cal-fcst">Fcst 0.3% — week's key event</div>
+    </div>
+    <div class="impact high">High</div>
+  </div>
+
+  <div class="cal-event">
+    <div class="cal-time mono">Thu 19:00</div>
+    <div>
+      <div class="cal-event-name">ECB Rate Decision</div>
+      <div class="cal-fcst">Fcst hold at 2.50%</div>
+    </div>
+    <div class="impact high">High</div>
+  </div>
+
+</div>
+
+<!-- HEADLINES -->
+<div class="headlines">
+  <div class="headlines-title">Top headlines</div>
+
+  <a href="#" class="headline high">
+    <div class="headline-text">Iran ceasefire extended by two weeks, talks progress on Hormuz reopening</div>
+    <div class="headline-meta"><span class="source">Reuters</span> · 3h ago · affects: ES, NQ, DXY, oil</div>
+  </a>
+
+  <a href="#" class="headline med">
+    <div class="headline-text">Trump renews criticism of Powell, fuels concerns over Fed independence</div>
+    <div class="headline-meta"><span class="source">Bloomberg</span> · 8h ago · affects: DXY, USD pairs, yields</div>
+  </a>
+
+  <a href="#" class="headline med">
+    <div class="headline-text">BOE repricing: markets now see three 25bp hikes in 2026, starting April</div>
+    <div class="headline-meta"><span class="source">FT</span> · 10h ago · affects: GBPUSD, gilts</div>
+  </a>
+
+  <a href="#" class="headline low">
+    <div class="headline-text">Lagarde holds ECB optionality, markets now price two hikes this year</div>
+    <div class="headline-meta"><span class="source">Reuters</span> · 14h ago · affects: EURUSD, Bunds</div>
+  </a>
+
+  <a href="#" class="headline low">
+    <div class="headline-text">NVDA up 1.2% pre-market as AI capex outlook from hyperscalers awaited</div>
+    <div class="headline-meta"><span class="source">CNBC</span> · 16h ago · affects: NQ, SOX</div>
+  </a>
+
+</div>
+
+<!-- SIGNAL CHECK -->
+<div class="signal-check">
+  <div class="signal-title">Signal alignment check</div>
+  <div class="signal-sub">Paste an ANCHOR signal to cross-check against today's fundamentals</div>
+  <div class="signal-input-row">
+    <input type="text" class="signal-input" placeholder="e.g. EURUSD long @ 1.1770, SL 1.1745">
+    <button class="signal-btn">Check →</button>
+  </div>
+</div>
+
+<footer>
+  Morning briefing auto-updates 07:00 SGT daily · Last run 07:15 SGT · ZeddFutures
+</footer>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content">
+    <!-- content injected -->
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// LIVE DATA LOADER
+// ═══════════════════════════════════════════════════════════════
+// Fetches /api/briefing (Netlify function) and rewrites the DOM.
+// Falls back to the hardcoded sample in localStorage on fetch failure,
+// so you never see a blank page if the cron is late.
+
+let briefingCache = null;
+
+document.addEventListener('DOMContentLoaded', loadBriefing);
+
+async function loadBriefing() {
+  try {
+    const res = await fetch('/api/briefing', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    briefingCache = data;
+    renderBriefing(data);
+  } catch (err) {
+    console.error('Failed to load briefing:', err);
+    const el = document.getElementById('header-date');
+    if (el) el.textContent = 'Briefing unavailable — check back shortly';
+  }
+}
+
+function renderBriefing(b) {
+  // ── Header date ─────────────────────────────────────────────
+  const gen = new Date(b.meta?.generatedAt || Date.now());
+  const sgtDate = gen.toLocaleDateString('en-GB', {
+    weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+    timeZone: 'Asia/Singapore'
+  });
+  const sgtTime = gen.toLocaleTimeString('en-GB', {
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'Asia/Singapore'
+  });
+  document.getElementById('header-date').textContent = `${sgtDate} · ${sgtTime} SGT`;
+
+  // ── Risk pill ───────────────────────────────────────────────
+  const pill = document.querySelector('.risk-pill');
+  if (pill && b.riskTone) {
+    pill.className = 'risk-pill ' + b.riskTone;
+    pill.textContent = b.riskTone === 'on' ? 'Risk-on' : b.riskTone === 'off' ? 'Risk-off' : 'Neutral';
+  }
+
+  // ── Market context metrics ──────────────────────────────────
+  renderMacro(b.macro || {});
+
+  // ── Narrative ───────────────────────────────────────────────
+  const narrative = document.querySelector('.context-narrative');
+  if (narrative && b.marketContext?.narrative) {
+    narrative.textContent = b.marketContext.narrative;
+  }
+
+  // ── Overnight moves ─────────────────────────────────────────
+  renderOvernight(b.overnight || {});
+
+  // ── Correlation matrix ──────────────────────────────────────
+  renderCorrelations(b.correlations || {}, b.correlationNote);
+
+  // ── Instrument cards ────────────────────────────────────────
+  renderInstruments(b.instruments || {});
+
+  // ── MAG7 earnings ───────────────────────────────────────────
+  renderEarnings(b.earnings || []);
+
+  // ── Headlines ───────────────────────────────────────────────
+  renderHeadlines(b.headlines || []);
+
+  // ── Calendar is rendered from b.meta if we want — for now
+  // keeping calendar placeholder HTML until we wire calendar events
+  // from the briefing output. (Generator currently returns headlines
+  // not calendar; we can extend the schema if you want.)
+}
+
+// ── Renderers ─────────────────────────────────────────────────
+
+function renderMacro(macro) {
+  const metricMap = { DXY: 0, US10Y: 1, VIX: 2, WTI: 3 };
+  const metrics = document.querySelectorAll('.metrics-row .metric');
+  for (const [key, idx] of Object.entries(metricMap)) {
+    const m = macro[key];
+    if (!m || !metrics[idx]) continue;
+    const valueEl = metrics[idx].querySelector('.metric-value');
+    if (!valueEl) continue;
+    const sign = m.direction === 'up' ? '+' : '';
+    const arrow = m.direction === 'up' ? 'up' : 'down';
+    const unit = key === 'US10Y' ? '%' : key === 'WTI' ? '' : '';
+    const prefix = key === 'WTI' ? '$' : '';
+    const delta = key === 'US10Y'
+      ? `${sign}${(m.absChange * 100).toFixed(0)}bp`
+      : `${sign}${m.pctChange.toFixed(2)}%`;
+    valueEl.innerHTML = `${prefix}${m.value.toFixed(2)}${unit} <span class="metric-delta ${arrow}">${delta}</span>`;
+  }
+}
+
+function renderOvernight(current) {
+  const cards = document.querySelectorAll('.overnight .overnight-card');
+  const order = ['EURUSD', 'GBPUSD', 'NQ', 'ES'];
+  order.forEach((id, i) => {
+    const c = current[id];
+    if (!c || !cards[i]) return;
+    const priceEl = cards[i].querySelector('.price');
+    const changeEl = cards[i].querySelector('.change');
+    if (priceEl) priceEl.textContent = formatPrice(c.price, id);
+    if (changeEl) {
+      const arrow = c.direction === 'up' ? '▲' : '▼';
+      const sign = c.direction === 'up' ? '+' : '';
+      changeEl.className = `change ${c.direction}`;
+      changeEl.textContent = `${arrow} ${sign}${c.pctChange.toFixed(2)}%`;
+    }
+  });
+}
+
+function formatPrice(p, id) {
+  if (id === 'EURUSD' || id === 'GBPUSD') return p.toFixed(4);
+  return Math.round(p).toLocaleString();
+}
+
+function renderCorrelations(corr, note) {
+  const order = ['EURUSD', 'GBPUSD', 'NQ', 'ES', 'DXY'];
+  const rows = document.querySelectorAll('.corr-table tbody tr');
+  order.forEach((rowKey, rowIdx) => {
+    const row = rows[rowIdx];
+    if (!row) return;
+    const cells = row.querySelectorAll('td');
+    // cells[0] is the label, then [1..5] are diag/values
+    for (let colIdx = 0; colIdx < order.length; colIdx++) {
+      const cell = cells[colIdx + 1];
+      if (!cell) continue;
+      if (rowIdx === colIdx) {
+        cell.className = 'diag';
+        cell.textContent = '—';
+        continue;
+      }
+      if (colIdx < rowIdx) {
+        // lower triangle — blank
+        cell.className = '';
+        cell.textContent = '';
+        continue;
+      }
+      const v = corr[rowKey]?.[order[colIdx]];
+      if (v === null || v === undefined) {
+        cell.className = 'corr-neutral';
+        cell.textContent = '—';
+        continue;
+      }
+      cell.className = corrColorClass(v);
+      cell.textContent = (v >= 0 ? '+' : '') + v.toFixed(2);
+    }
+  });
+
+  // Update note if provided
+  const noteEl = document.querySelector('.corr-note');
+  if (noteEl && note) noteEl.textContent = note;
+}
+
+function corrColorClass(v) {
+  if (v >= 0.7) return 'corr-very-pos';
+  if (v >= 0.3) return 'corr-pos';
+  if (v <= -0.7) return 'corr-very-neg';
+  if (v <= -0.3) return 'corr-neg';
+  return 'corr-neutral';
+}
+
+function renderInstruments(instruments) {
+  const order = [
+    { id: 'EURUSD', key: 'eurusd' },
+    { id: 'GBPUSD', key: 'gbpusd' },
+    { id: 'NQ',     key: 'nq'     },
+    { id: 'ES',     key: 'es'     }
+  ];
+  const cards = document.querySelectorAll('.instruments .instrument');
+
+  order.forEach((o, i) => {
+    const inst = instruments[o.id];
+    const card = cards[i];
+    if (!inst || !card) return;
+
+    // Bias class + pill
+    card.className = 'instrument ' + biasClass(inst.bias);
+    const pill = card.querySelector('.bias-pill');
+    if (pill) {
+      pill.className = 'bias-pill ' + biasClass(inst.bias);
+      pill.textContent = capitalize(inst.bias);
+    }
+
+    // Summary
+    const summaryEl = card.querySelector('.inst-summary');
+    if (summaryEl) summaryEl.textContent = inst.summary;
+
+    // Alignment
+    const items = card.querySelectorAll('.align-item .align-value');
+    if (items[0]) setAlignment(items[0], inst.longAlignment);
+    if (items[1]) setAlignment(items[1], inst.shortAlignment);
+
+    // onclick: pass the instrument id so we can look up the full data
+    card.onclick = () => openInstrumentModal(o.id);
+  });
+}
+
+function biasClass(b) {
+  if (b === 'bullish') return 'bull';
+  if (b === 'bearish') return 'bear';
+  return 'neutral';
+}
+
+function setAlignment(el, status) {
+  const map = {
+    supported: { icon: '✓', color: 'up', text: 'Supported' },
+    conflict:  { icon: '⚠', color: 'down', text: 'Conflict' },
+    against:   { icon: '✗', color: 'down', text: 'Against' },
+    mixed:     { icon: '~', color: null, text: 'Mixed' }
+  };
+  const m = map[status] || map.mixed;
+  el.className = 'align-value' + (m.color ? ' ' + m.color : '');
+  if (!m.color) el.style.color = 'var(--amber)';
+  else el.style.color = '';
+  el.textContent = `${m.icon} ${m.text}`;
+}
+
+function capitalize(s) {
+  return s ? s[0].toUpperCase() + s.slice(1) : '';
+}
+
+function renderEarnings(earnings) {
+  const container = document.querySelector('.mag7');
+  if (!container) return;
+  // Keep header, replace items
+  const header = container.querySelector('.mag7-header');
+  const items = container.querySelectorAll('.earnings-item');
+  items.forEach(i => i.remove());
+
+  earnings.forEach(e => {
+    const item = document.createElement('div');
+    item.className = 'earnings-item';
+    item.innerHTML = `
+      <div>
+        <div class="earnings-ticker">${e.ticker}</div>
+        <div class="earnings-date">${e.date}<br>${e.timeSGT}</div>
+      </div>
+      <div class="earnings-body">
+        <div class="earnings-stats">
+          <div class="stat"><span>EPS est</span>${e.epsEstimate || 'n/a'}</div>
+          <div class="stat"><span>Beat rate</span>${e.beatRate || 'n/a'}</div>
+          <div class="stat"><span>NQ weight</span>${e.nqWeight || 'n/a'}</div>
+          <div class="stat"><span>Avg move</span>${e.avgMove || 'n/a'}</div>
+        </div>
+        <div class="interpretation">
+          <div class="interpretation-label">Interpretation</div>
+          ${e.interpretation}
+        </div>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function renderHeadlines(headlines) {
+  const container = document.querySelector('.headlines');
+  if (!container) return;
+  const links = container.querySelectorAll('.headline');
+  links.forEach(l => l.remove());
+
+  headlines.forEach(h => {
+    const a = document.createElement('a');
+    a.className = `headline ${h.impact || 'low'}`;
+    a.href = h.url || '#';
+    if (h.url) a.target = '_blank';
+    a.innerHTML = `
+      <div class="headline-text">${escape(h.text)}</div>
+      <div class="headline-meta"><span class="source">${escape(h.source)}</span> · ${h.hoursAgo}h ago · affects: ${escape(h.affects || '')}</div>
+    `;
+    container.appendChild(a);
+  });
+}
+
+function escape(s) {
+  return String(s || '').replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
+}
+
+// ── Modal ─────────────────────────────────────────────────────
+
+function openInstrumentModal(id) {
+  const inst = briefingCache?.instruments?.[id];
+  if (!inst) return;
+
+  const modal = document.getElementById('modal-content');
+  const fa = inst.fullAnalysis || {};
+  const sections = [
+    { label: 'Fundamental bias',     body: fa.bias     || inst.summary },
+    { label: "What's driving it",    body: fa.drivers  || '' },
+    { label: 'Key levels',           body: fa.levels   || '' },
+    { label: 'Risks to the view',    body: fa.risks    || '' },
+    { label: 'Your setup alignment', body: fa.alignment|| '' }
+  ].filter(s => s.body);
+
+  let html = `
+    <div class="modal-header">
+      <div class="modal-title">${id} — Full analysis</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+  `;
+  sections.forEach(s => {
+    html += `
+      <div class="modal-section">
+        <div class="modal-section-label">${s.label}</div>
+        <p>${escape(s.body)}</p>
+      </div>
+    `;
+  });
+
+  if (inst.articles && inst.articles.length) {
+    html += `<div class="modal-section"><div class="modal-section-label">Source articles</div>`;
+    inst.articles.forEach(a => {
+      html += `
+        <a class="article-ref" href="${a.url || '#'}" ${a.url ? 'target="_blank"' : ''}>
+          <div class="article-headline">${escape(a.title)}</div>
+          <div class="article-meta">${escape(a.source)} · ${escape(a.date)}</div>
+        </a>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  modal.innerHTML = html;
+  document.getElementById('modal-backdrop').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// Backdrop click closes modal
+document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+</script>
+
+</body>
+</html>
