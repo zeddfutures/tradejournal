@@ -19,3 +19,8 @@
   from = "/api/briefing"
   to = "/.netlify/functions/briefing"
   status = 200
+
+  [[redirects]]
+  from = "/economicnews"
+  to = "/economic-news.html"
+  status = 200
